@@ -7,8 +7,36 @@
 
 namespace vk {
 
+class instance;
+class device;
 class physical_device;
 class queue;
+class shader_module;
+class buffer;
+class semaphore;
+class command_buffer;
+class fence;
+class device_memory;
+class image;
+class event;
+class query_pool;
+class buffer_view;
+class image_view;
+class pipeline_cache;
+class pipeline_layout;
+class render_pass;
+class pipeline;
+class descriptor_set_layout;
+class sampler;
+class descriptor_pool;
+class descriptor_set;
+class frame_buffer;
+class command_pool;
+class surface;
+class swapchain;
+class display;
+class display_mode;
+class debug_report_callback;
 
 template<typename I>
 class iterator_range : std::pair<I, I> {
@@ -99,6 +127,31 @@ private:
   class impl;
   std::shared_ptr<impl> impl_;
 };
+
+class semaphore {};
+class command_buffer {};
+class fence {};
+class device_memory {};
+class image {};
+class event {};
+class query_pool {};
+class buffer_view {};
+class image_view {};
+class pipeline_cache {};
+class pipeline_layout {};
+class render_pass {};
+class pipeline {};
+class descriptor_set_layout {};
+class sampler {};
+class descriptor_pool {};
+class descriptor_set {};
+class frame_buffer {};
+class command_pool {};
+class surface {};
+class swapchain {};
+class display {};
+class display_mode {};
+class debug_report_callback {};
 
 }
 
