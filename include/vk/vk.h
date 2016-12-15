@@ -8,6 +8,7 @@
 namespace vk {
 
 class physical_device;
+class queue;
 
 template<typename I>
 class iterator_range : std::pair<I, I> {
@@ -69,6 +70,31 @@ private:
 class device {
 public:
   device(const physical_device&);
+
+  queue get_queue(uint32_t family, uint32_t index);
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class queue {
+private: 
+  queue(VkQueue handle);
+public:
+  void submit();
+  void wait_idle();
+private:
+  VkQueue handle_;
+
+  friend class device;
+};
+
+class shader_module {};
+
+class buffer {
+public:
+  buffer(instance);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;

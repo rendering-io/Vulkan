@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 include_directories(include)
 
 # Globally set compile options.
-add_compile_options(-std=c++14)
+add_compile_options(-std=c++14 -Wall -Wpedantic -Werror)
 
 # Build the lib subdirectory.
 add_subdirectory(lib)

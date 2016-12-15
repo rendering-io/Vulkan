@@ -1,6 +1,8 @@
 # Build the vk library.
-add_library(vk device.c++
+add_library(vk buffer.c++
+               device.c++
                instance.c++
-	       physical_device.c++)
+	       physical_device.c++
+               queue.c++)
 target_link_libraries(vk PUBLIC vulkan)
 
