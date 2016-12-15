@@ -9,3 +9,36 @@ Not all objects have creation/destruction functions. For example, queues are
 tightly bound to logical device construction. Where objects do have 
 creation/destruction functions, the default design pattern should be to indirect
 implementions through a shared pointer.
+
+The following is a list of all core and common extension handles:
+
+  VkInstance
+  VkPhysicalDevice
+  VkDevice
+  VkQueue
+  VkSemaphore
+  VkCommandBuffer
+  VkFence
+  VkDeviceMemory
+  VkBuffer
+  VkImage
+  VkEvent
+  VkQueryPool
+  VkBufferView
+  VkImageView
+  VkShaderModule
+  VkPipelineCache
+  VkPipelineLayout
+  VkRenderPass
+  VkPipeline
+  VkDescriptorSetLayout
+  VkSampler
+  VkDescriptorPool
+  VkDescriptorSet
+  VkFramebuffer
+  VkCommandPool
+  VkSurfaceKHR
+  VkSwapchainKHR
+  VkDisplayKHR
+  VkDisplayModeKHR
+  VkDebugReportCallbackEXT
