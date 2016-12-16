@@ -130,7 +130,7 @@ private:
 
 class buffer {
 public:
-  buffer(instance);
+  buffer(device);
 
 private:
   class impl;
