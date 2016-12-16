@@ -99,6 +99,7 @@ class device {
 public:
   device(const physical_device&);
 
+  operator VkDevice();
   queue get_queue(uint32_t family, uint32_t index);
 private:
   class impl;
@@ -117,7 +118,15 @@ private:
   friend class device;
 };
 
-class shader_module {};
+class shader_module {
+public:
+  shader_module(device device, const uint32_t* code, size_t size_in_bytes);
+  operator VkShaderModule();
+
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
 
 class buffer {
 public:
@@ -128,30 +137,124 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
-class semaphore {};
+class semaphore {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
 class command_buffer {};
-class fence {};
+class fence {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
 class device_memory {};
-class image {};
-class event {};
-class query_pool {};
-class buffer_view {};
-class image_view {};
-class pipeline_cache {};
-class pipeline_layout {};
-class render_pass {};
-class pipeline {};
-class descriptor_set_layout {};
-class sampler {};
-class descriptor_pool {};
+class image {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class event {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class query_pool {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class buffer_view {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class image_view {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class pipeline_cache {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class pipeline_layout {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class render_pass {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class pipeline {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class descriptor_set_layout {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class sampler {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class descriptor_pool {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
 class descriptor_set {};
-class frame_buffer {};
-class command_pool {};
-class surface {};
-class swapchain {};
+class frame_buffer {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class command_pool {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class surface {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
+class swapchain {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
 class display {};
 class display_mode {};
-class debug_report_callback {};
+class debug_report_callback {
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
 
 }
 
