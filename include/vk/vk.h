@@ -188,6 +188,8 @@ private:
 };
 
 class pipeline_layout {
+public:
+  operator VkPipelineLayout();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -200,6 +202,10 @@ private:
 };
 
 class pipeline {
+public:
+  pipeline(device device, pipeline_layout layout,
+           shader_module module, const char* entry_point);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
