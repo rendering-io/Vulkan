@@ -230,6 +230,9 @@ private:
 };
 
 class descriptor_pool {
+public:
+  descriptor_pool(device device, uint32_t max_sets);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -245,7 +248,7 @@ private:
 class command_pool {
 public:
   command_pool(device device, uint32_t queue_family);
-  
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;

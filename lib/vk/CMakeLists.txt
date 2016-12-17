@@ -1,6 +1,7 @@
 # Build the vk library.
 add_library(vk buffer.c++
                command_pool.c++
+               descriptor_pool.c++
                descriptor_set_layout.c++
                device.c++
                instance.c++
