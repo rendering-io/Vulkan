@@ -216,7 +216,7 @@ private:
 class descriptor_set_layout {
 public:
   descriptor_set_layout(device device, void*, size_t layout_count);
-  
+
   operator VkDescriptorSetLayout();
 private:
   class impl;
@@ -243,6 +243,9 @@ private:
 };
 
 class command_pool {
+public:
+  command_pool(device device, uint32_t queue_family);
+  
 private:
   class impl;
   std::shared_ptr<impl> impl_;
