@@ -189,6 +189,8 @@ private:
 
 class pipeline_layout {
 public:
+  pipeline_layout(device device, descriptor_set_layout* layouts, 
+                  size_t layout_count);
   operator VkPipelineLayout();
 private:
   class impl;
@@ -212,6 +214,8 @@ private:
 };
 
 class descriptor_set_layout {
+public:
+  operator VkDescriptorSetLayout();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

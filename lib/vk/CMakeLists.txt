@@ -4,6 +4,7 @@ add_library(vk buffer.c++
                instance.c++
                physical_device.c++
                pipeline.c++
+               pipeline_layout.c++
                queue.c++
                shader_module.c++)
 target_link_libraries(vk PUBLIC vulkan)
