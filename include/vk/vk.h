@@ -215,6 +215,8 @@ private:
 
 class descriptor_set_layout {
 public:
+  descriptor_set_layout(device device, void*, size_t layout_count);
+  
   operator VkDescriptorSetLayout();
 private:
   class impl;
