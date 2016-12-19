@@ -35,3 +35,7 @@ device_memory::device_memory(device device, const physical_device::memory_type &
          "Failed to allocate device memory.");
 }
 
+device_memory::operator VkDeviceMemory() {
+  return impl_->handle_;
+}
+

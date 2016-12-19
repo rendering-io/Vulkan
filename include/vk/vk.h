@@ -160,6 +160,7 @@ class buffer {
 public:
   buffer(device device, size_t size_in_bytes);
 
+  void bind_memory(device_memory memory, size_t offset, size_t size);
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -181,6 +182,10 @@ private:
 class device_memory {
 private:
   device_memory(device, const physical_device::memory_type&, size_t); 
+
+public:
+  operator VkDeviceMemory();
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
