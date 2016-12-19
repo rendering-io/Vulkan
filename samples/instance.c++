@@ -29,7 +29,12 @@ int main(int argc, char **argv) {
   vk::device device{*best_physical_device};
   vk::queue queue = device.get_queue(family->index, 0);
   
-  
+  // Create three buffers,
+  vk::buffer a{device, 1024};
+  vk::buffer b{device, 1024};
+  vk::buffer c{device, 1024};
+
+
   // Wait for the queue to be idle.
   queue.wait_idle();
   std::cout << "Done waiting for idle.\n";

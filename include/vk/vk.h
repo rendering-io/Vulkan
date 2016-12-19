@@ -130,7 +130,7 @@ private:
 
 class buffer {
 public:
-  buffer(device);
+  buffer(device device, size_t size_in_bytes);
 
 private:
   class impl;

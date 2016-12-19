@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -21,6 +22,21 @@ buffer::impl::~impl() {
     vkDestroyBuffer(device_, handle_, nullptr);
 }
 
-buffer::buffer(device device)
-: impl_{std::make_shared<impl>(std::move(device))} { }
+buffer::buffer(device device, size_t size_in_bytes)
+: impl_{std::make_shared<impl>(std::move(device))} {
+
+  // Creation state for a buffer.
+  VkBufferCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.size = size_in_bytes;
+  info.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+  info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  info.queueFamilyIndexCount = 0;
+  info.pQueueFamilyIndices = nullptr;
+
+  auto result = vkCreateBuffer(impl_->device_, &info, nullptr, &impl_->handle_);
+  assert(VK_SUCCESS == result && "Buffer creation failed.");
+}
 
