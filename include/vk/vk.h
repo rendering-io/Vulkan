@@ -180,7 +180,7 @@ private:
 };
 
 class device_memory {
-private:
+public:
   device_memory(device, const physical_device::memory_type&, size_t); 
 
 public:
@@ -189,7 +189,13 @@ public:
 private:
   class impl;
   std::shared_ptr<impl> impl_;
+
+  friend bool map_memory(device_memory memory, size_t offset, size_t size, void **ptr);
+  friend void unmap_memory(device_memory memory);
 };
+
+bool map_memory(device_memory, size_t, size_t, void **);
+void unmap_memory(device_memory memory);
 
 class image {
 private:

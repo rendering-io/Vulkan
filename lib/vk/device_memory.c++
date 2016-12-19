@@ -39,3 +39,16 @@ device_memory::operator VkDeviceMemory() {
   return impl_->handle_;
 }
 
+bool vk::map_memory(device_memory memory, size_t offset, size_t size, void **ptr) {
+ auto result = vkMapMemory(memory.impl_->device_,
+                           memory, offset, size, 0, ptr);
+ if (VK_SUCCESS == result)
+   return true;
+ else
+   return false;
+}
+
+void vk::unmap_memory(device_memory memory) {
+  vkUnmapMemory(memory.impl_->device_, memory);
+}
+
