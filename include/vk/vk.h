@@ -36,7 +36,6 @@ class surface;
 class swapchain;
 class display;
 class display_mode;
-class debug_report_callback;
 
 template<typename I>
 class iterator_range : std::pair<I, I> {
@@ -268,11 +267,6 @@ private:
 
 class display {};
 class display_mode {};
-class debug_report_callback {
-private:
-  class impl;
-  std::shared_ptr<impl> impl_;
-};
 
 }
 
