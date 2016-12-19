@@ -106,10 +106,10 @@ private:
 class physical_device::memory_type {
 private:
 public:
-  memory_type(const VkMemoryType&, const VkMemoryHeap&);
-  memory_type(const memory_type&);
+  memory_type(uint32_t index, const VkMemoryType&, const VkMemoryHeap&);
 
 public:
+  const uint32_t index;
   bool is_device_local() const;
   bool is_host_visible() const;
   bool is_host_coherent() const;
@@ -178,7 +178,14 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
-class device_memory {};
+class device_memory {
+private:
+  device_memory(device, const physical_device::memory_type&, size_t); 
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+};
+
 class image {
 private:
   class impl;

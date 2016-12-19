@@ -7,14 +7,12 @@ queue_family::queue_family(uint32_t index, uint32_t count, VkQueueFlags flags)
 { 
 }
 
-physical_device::memory_type::memory_type(const VkMemoryType& type,
+physical_device::memory_type::memory_type(uint32_t index,
+                                          const VkMemoryType& type,
                                           const VkMemoryHeap& heap)
-: type_{type}, heap_{heap} {
+: index{index}, type_{type}, heap_{heap} {
 
 }
-
-physical_device::memory_type::memory_type(const memory_type& src)
-: type_{src.type_}, heap_{src.heap_} {}
 
 bool physical_device::memory_type::is_device_local() const {
   return type_.propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -57,7 +55,7 @@ physical_device::physical_device(VkPhysicalDevice handle)
   vkGetPhysicalDeviceMemoryProperties(handle_, &memory_properties_);
   for (auto i = 0u; i < memory_properties_.memoryTypeCount; ++i) {
     auto &memory_type = memory_properties_.memoryTypes[i];
-    memory_types_.emplace_back(memory_type,
+    memory_types_.emplace_back(i, memory_type,
                        memory_properties_.memoryHeaps[memory_type.heapIndex]);
   }
 }
