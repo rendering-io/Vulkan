@@ -52,6 +52,10 @@ device::device(const physical_device& physical_dev)
   impl_->handle_ = handle;
 }
 
+device::operator VkDevice() {
+  return impl_->handle_;
+}
+
 queue device::get_queue(uint32_t queue_family, uint32_t index) {
   VkQueue queue_handle = 0;
 
