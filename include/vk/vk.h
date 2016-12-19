@@ -80,18 +80,47 @@ private:
   physical_device(VkPhysicalDevice);
 
 public:
+  class memory_type;
+  using memory_type_iterator  = std::vector<memory_type>::const_iterator;
+  using memory_type_range     = iterator_range<memory_type_iterator>;
   using queue_family_iterator = std::vector<queue_family>::const_iterator;
-  using queue_family_range = iterator_range<queue_family_iterator>;
+  using queue_family_range    = iterator_range<queue_family_iterator>;
   
   operator VkPhysicalDevice() const { return handle_; }
 
+  memory_type_range memory_types() const;
   queue_family_range queue_families() const;
 private: 
   VkPhysicalDevice handle_;
 
   // Supported queue families.
-  std::vector<queue_family> queue_families_; 
+  std::vector<queue_family> queue_families_;
+
+  // Memory types and heaps.
+  VkPhysicalDeviceMemoryProperties memory_properties_;
+  std::vector<memory_type> memory_types_;
+
   friend class instance;
+};
+
+class physical_device::memory_type {
+private:
+public:
+  memory_type(const VkMemoryType&, const VkMemoryHeap&);
+  memory_type(const memory_type&);
+
+public:
+  bool is_device_local() const;
+  bool is_host_visible() const;
+  bool is_host_coherent() const;
+  bool is_host_cached() const;
+  bool is_lazily_allocated() const;
+
+private:
+  const VkMemoryType type_;
+  const VkMemoryHeap heap_;
+
+  friend class physical_device;
 };
 
 class device {

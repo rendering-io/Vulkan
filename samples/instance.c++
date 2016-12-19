@@ -28,7 +28,19 @@ int main(int argc, char **argv) {
   // Now we can create a logical device.
   vk::device device{*best_physical_device};
   vk::queue queue = device.get_queue(family->index, 0);
-  
+
+  // Now we want to find a host-coherent memory region.
+  const vk::physical_device::memory_type* best_memory_type = nullptr;
+  for (auto &memory_type: best_physical_device->memory_types()) {
+    if (memory_type.is_host_coherent())
+      best_memory_type = &memory_type;
+  }
+
+  if (nullptr == best_memory_type) {
+    std::cerr << "Unable to find a host-coherent memory type. Exiting...";
+    return -1;
+  }
+
   // Create three buffers,
   vk::buffer a{device, 1024};
   vk::buffer b{device, 1024};
