@@ -44,3 +44,8 @@ pipeline_layout::pipeline_layout(device device, descriptor_set_layout* layouts,
   assert(VK_SUCCESS == result &&
          "Failed to create pipeline layout.");
 }
+
+pipeline_layout::operator VkPipelineLayout() {
+  return impl_->handle_;
+}
+

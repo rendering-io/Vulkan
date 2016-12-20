@@ -21,20 +21,18 @@ descriptor_set_layout::impl::~impl() {
   }
 }
 
-descriptor_set_layout::descriptor_set_layout(device device, void*, size_t binding_count)
+descriptor_set_layout::descriptor_set_layout(device device, 
+                                             const descriptor_set_layout_binding* bindings, 
+                                             size_t binding_count)
 : impl_{std::make_shared<impl>(device)}
 {
   // Populate a vector of layout handles.
-  std::vector<VkDescriptorSetLayoutBinding> bindings(binding_count);
+  std::vector<VkDescriptorSetLayoutBinding> layout_bindings(binding_count);
   for (auto i = 0ul; i < binding_count; ++i) {
-    assert(false && "Creation of bindings not yet implemented.");
-    /*
-    bindings[i].binding = ;
-    bindings[i].descriptorType = ;
-    bindings[i].descriptorCount = ;
-    bindings[i].stageFlags = ;
-    bindings[i].pImmutableSamplers = ;
-    */
+    layout_bindings[i].binding = bindings[i].get_index();
+    layout_bindings[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    layout_bindings[i].stageFlags = VK_SHADER_STAGE_ALL;
+    layout_bindings[i].pImmutableSamplers = nullptr;
   }
 
   VkDescriptorSetLayoutCreateInfo info;
@@ -42,7 +40,7 @@ descriptor_set_layout::descriptor_set_layout(device device, void*, size_t bindin
   info.pNext = nullptr;
   info.flags = 0;
   info.bindingCount = binding_count;
-  info.pBindings = bindings.data();
+  info.pBindings = layout_bindings.data();
 
   auto result = vkCreateDescriptorSetLayout(impl_->device_, &info, nullptr,
                                        &impl_->handle_);

@@ -259,9 +259,22 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
+class descriptor_set_layout_binding {
+public:
+  descriptor_set_layout_binding(uint32_t index)
+  : binding_index_{index} { }
+
+  uint32_t get_index() const { return binding_index_; }
+
+private:
+  uint32_t binding_index_;
+
+};
+
 class descriptor_set_layout {
 public:
-  descriptor_set_layout(device device, void*, size_t layout_count);
+  descriptor_set_layout(device device, const descriptor_set_layout_binding* bindings,
+                        size_t binding_count);
 
   operator VkDescriptorSetLayout();
 private:
@@ -279,12 +292,24 @@ class descriptor_pool {
 public:
   descriptor_pool(device device, uint32_t max_sets);
 
+  operator VkDescriptorPool();
+  descriptor_set allocate(descriptor_set_layout layout);
 private:
   class impl;
   std::shared_ptr<impl> impl_;
 };
 
-class descriptor_set {};
+class descriptor_set {
+private:
+  descriptor_set(device device, descriptor_pool pool, VkDescriptorSet);
+public:
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+
+  friend class descriptor_pool;
+};
+
 class frame_buffer {
 private:
   class impl;
