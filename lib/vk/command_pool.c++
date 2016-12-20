@@ -36,3 +36,24 @@ command_pool::command_pool(device device, uint32_t queue_family)
   assert(VK_SUCCESS == result &&
          "Failed to create command pool.");
 }
+
+command_pool::operator VkCommandPool() {
+  return impl_->handle_;
+}
+
+command_buffer command_pool::allocate() {
+
+  VkCommandBufferAllocateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  info.pNext = nullptr;
+  info.commandPool = *this;
+  info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  info.commandBufferCount = 1;
+
+  VkCommandBuffer handle = VK_NULL_HANDLE;
+  auto result = vkAllocateCommandBuffers(impl_->device_, &info, &handle);
+  assert(VK_SUCCESS == result && "Failed to allocate command buffer.");
+
+  return command_buffer{impl_->device_, *this, handle};
+}
+

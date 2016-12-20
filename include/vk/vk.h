@@ -138,7 +138,7 @@ class queue {
 private: 
   queue(VkQueue handle);
 public:
-  void submit();
+  void submit(command_buffer* buffers, size_t buffer_count);
   void wait_idle();
 private:
   VkQueue handle_;
@@ -172,7 +172,25 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
-class command_buffer {};
+class command_buffer {
+private:
+  command_buffer(device device, command_pool pool, VkCommandBuffer handle);
+
+public:
+  void begin();
+  void end();
+
+  void bind_pipeline(pipeline pipeline);
+  void bind_descriptor_sets(pipeline_layout layout, descriptor_set* sets, size_t count);
+  void dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1);
+
+private:
+  class impl;
+  std::shared_ptr<impl> impl_;
+
+  friend class command_pool;
+};
+
 class fence {
 private:
   class impl;
@@ -254,6 +272,7 @@ public:
   pipeline(device device, pipeline_layout layout,
            shader_module module, const char* entry_point);
 
+  operator VkPipeline();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -303,6 +322,8 @@ class descriptor_set {
 private:
   descriptor_set(device device, descriptor_pool pool, VkDescriptorSet);
 public:
+  operator VkDescriptorSet();
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -320,6 +341,9 @@ class command_pool {
 public:
   command_pool(device device, uint32_t queue_family);
 
+  operator VkCommandPool();
+
+  command_buffer allocate();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

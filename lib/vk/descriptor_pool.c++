@@ -32,6 +32,10 @@ descriptor_set::impl::~impl() {
   }
 }
 
+descriptor_set::operator VkDescriptorSet() {
+  return impl_->handle_;
+}
+
 descriptor_pool::impl::impl(device device)
 : device_{std::move(device)}, handle_{VK_NULL_HANDLE} { }
 

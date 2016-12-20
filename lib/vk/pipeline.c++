@@ -51,3 +51,8 @@ pipeline::pipeline(device device, pipeline_layout layout,
   assert(VK_SUCCESS == result &&
          "Failed to create compute pipeline.");
 }
+
+pipeline::operator VkPipeline() {
+  return impl_->handle_;
+}
+

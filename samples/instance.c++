@@ -102,8 +102,19 @@ int main(int argc, char **argv) {
   // actually bound the buffers into a concrete descriptor. Now we create
   // the real descriptor.
   vk::descriptor_pool descriptor_pool{device, 1};
+  vk::descriptor_set descriptor = descriptor_pool.allocate(layout);
 
-  // Wait for the queue to be idle.
+  // Once all our bindings are set up we can build a command buffer.
+  vk::command_pool command_pool{device, family->index};
+  vk::command_buffer cmd = command_pool.allocate();
+  cmd.begin();
+  cmd.bind_pipeline(pipeline);
+  cmd.bind_descriptor_sets(pipeline_layout, &descriptor, 1);
+  cmd.dispatch(256);
+  cmd.end();
+
+  // Submit and wait for the queue to be idle.
+  queue.submit(&cmd, 1);
   queue.wait_idle();
   std::cout << "Done waiting for idle.\n";
 
