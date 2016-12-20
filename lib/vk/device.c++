@@ -20,6 +20,23 @@ device::device(const physical_device& physical_dev)
 
   impl_->handle_ = 0;
 
+  // Enumerate the available layers.
+  uint32_t count = 0;
+  std::vector<VkLayerProperties> layers;
+  std::vector<const char*> enabled_layers;
+  auto result = vkEnumerateDeviceLayerProperties(physical_dev, &count, nullptr);
+  if (VK_SUCCESS == result) {
+    layers.resize(count);
+    result = vkEnumerateDeviceLayerProperties(physical_dev, &count, layers.data());
+    if (VK_SUCCESS == result) {
+      for (auto &layer: layers) {
+        // We should really check each layer individually, but for now our test 
+        // implementation only exposes validation layers.
+        enabled_layers.push_back(layer.layerName);
+      }
+    }
+  }
+  
   // For now we will just default to the first queue. This is easy but wrong.
   float priority = 1.0f;
 
@@ -38,14 +55,14 @@ device::device(const physical_device& physical_dev)
   info.flags = 0;
   info.queueCreateInfoCount = 1;
   info.pQueueCreateInfos = &queue_info;
-  info.enabledLayerCount = 0;
-  info.ppEnabledLayerNames = nullptr;
+  info.enabledLayerCount = enabled_layers.size();
+  info.ppEnabledLayerNames = enabled_layers.data();
   info.enabledExtensionCount = 0;
   info.ppEnabledExtensionNames = nullptr;
   info.pEnabledFeatures = nullptr;
 
   VkDevice handle = 0;
-  auto result = vkCreateDevice(physical_dev, &info, nullptr, &handle);
+  result = vkCreateDevice(physical_dev, &info, nullptr, &handle);
   if (VK_SUCCESS != result)
     return;
 
