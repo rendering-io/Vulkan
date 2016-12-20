@@ -36,6 +36,29 @@ descriptor_set::operator VkDescriptorSet() {
   return impl_->handle_;
 }
 
+void descriptor_set::update(descriptor_binding* bindings, size_t binding_count) {
+  std::vector<VkWriteDescriptorSet> writes(binding_count);
+  std::vector<VkDescriptorBufferInfo> buffer_info(binding_count);
+  for (auto i = 0ul; i < writes.size(); ++i) {
+    buffer_info[i].buffer = bindings[i].buf;
+    buffer_info[i].offset = 0;
+    buffer_info[i].range = 16;//VK_WHOLE_SIZE;
+
+    writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[i].pNext = nullptr;
+    writes[i].dstSet = impl_->handle_;
+    writes[i].dstBinding = bindings[i].index;
+    writes[i].dstArrayElement = 0;
+    writes[i].descriptorCount = 1;
+    writes[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    writes[i].pImageInfo = nullptr;
+    writes[i].pBufferInfo = &buffer_info[i];
+    writes[i].pTexelBufferView = nullptr;
+  }
+
+  vkUpdateDescriptorSets(impl_->device_, binding_count, writes.data(), 0, nullptr);
+}
+
 descriptor_pool::impl::impl(device device)
 : device_{std::move(device)}, handle_{VK_NULL_HANDLE} { }
 

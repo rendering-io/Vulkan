@@ -31,6 +31,7 @@ descriptor_set_layout::descriptor_set_layout(device device,
   for (auto i = 0ul; i < binding_count; ++i) {
     layout_bindings[i].binding = bindings[i].get_index();
     layout_bindings[i].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    layout_bindings[i].descriptorCount = 1;
     layout_bindings[i].stageFlags = VK_SHADER_STAGE_ALL;
     layout_bindings[i].pImmutableSamplers = nullptr;
   }

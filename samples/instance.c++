@@ -87,12 +87,12 @@ int main(int argc, char **argv) {
   vk::shader_module shader{device, spirv.data(), spirv.size() * sizeof(uint32_t)};
 
   // Define some layout bindings.
-  std::vector<vk::descriptor_set_layout_binding> bindings;
-  bindings.emplace_back(0);
-  bindings.emplace_back(1);
-  bindings.emplace_back(2);
+  std::vector<vk::descriptor_set_layout_binding> layout_bindings;
+  layout_bindings.emplace_back(0);
+  layout_bindings.emplace_back(1);
+  layout_bindings.emplace_back(2);
 
-  vk::descriptor_set_layout layout{device, bindings.data(), bindings.size()};
+  vk::descriptor_set_layout layout{device, layout_bindings.data(), layout_bindings.size()};
   vk::pipeline_layout pipeline_layout{device, &layout, 1}; 
 
   // Now construct a pipeline.
@@ -103,6 +103,12 @@ int main(int argc, char **argv) {
   // the real descriptor.
   vk::descriptor_pool descriptor_pool{device, 1};
   vk::descriptor_set descriptor = descriptor_pool.allocate(layout);
+
+  std::vector<vk::descriptor_binding> bindings;
+  bindings.emplace_back(0, a);
+  bindings.emplace_back(1, b);
+  bindings.emplace_back(2, c);
+  descriptor.update(bindings.data(), bindings.size());
 
   // Once all our bindings are set up we can build a command buffer.
   vk::command_pool command_pool{device, family->index};

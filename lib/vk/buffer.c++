@@ -40,6 +40,11 @@ buffer::buffer(device device, size_t size_in_bytes)
   assert(VK_SUCCESS == result && "Buffer creation failed.");
 }
 
+buffer::operator VkBuffer() {
+  return impl_->handle_;
+}
+
 void buffer::bind_memory(device_memory memory, size_t offset, size_t /*size*/) {
   vkBindBufferMemory(impl_->device_, impl_->handle_, memory, offset);
 }
+

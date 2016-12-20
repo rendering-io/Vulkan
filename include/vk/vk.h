@@ -160,6 +160,8 @@ class buffer {
 public:
   buffer(device device, size_t size_in_bytes);
 
+  operator VkBuffer();
+
   void bind_memory(device_memory memory, size_t offset, size_t size);
 private:
   class impl;
@@ -318,12 +320,22 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
+class descriptor_binding {
+public:
+  descriptor_binding(uint32_t i, buffer buffer)
+  : index{i}, buf{buffer} { }
+
+  uint32_t index;
+  buffer buf;
+};
+
 class descriptor_set {
 private:
   descriptor_set(device device, descriptor_pool pool, VkDescriptorSet);
 public:
   operator VkDescriptorSet();
 
+  void update(descriptor_binding* bindings, size_t binding_count);
 private:
   class impl;
   std::shared_ptr<impl> impl_;
