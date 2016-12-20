@@ -68,9 +68,9 @@ int main(int argc, char **argv) {
 
   // We should be calling get_memory_requirements for each buffer here.
   vk::device_memory storage{device, *best_memory_type, 3 * 1024};
-  a.bind_memory(storage, 0, 1024);
-  b.bind_memory(storage, 1024, 1024);
-  c.bind_memory(storage, 2048, 1024);
+  a.bind(storage, 0, 1024);
+  b.bind(storage, 1024, 1024);
+  c.bind(storage, 2048, 1024);
 
   // Map the range of buffer b.
   void *ptr = nullptr;
@@ -123,6 +123,12 @@ int main(int argc, char **argv) {
   queue.submit(&cmd, 1);
   queue.wait_idle();
   std::cout << "Done waiting for idle.\n";
+
+  // Unbind the memory, since it's destructor calls before the buffers.
+  a.unbind();
+  b.unbind();
+  c.unbind();
+
 
   return 0;
 }
