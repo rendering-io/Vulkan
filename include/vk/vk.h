@@ -163,7 +163,6 @@ public:
   operator VkBuffer();
 
   void bind(device_memory memory, size_t offset, size_t size);
-  void unbind();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

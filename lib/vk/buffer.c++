@@ -48,6 +48,3 @@ void buffer::bind(device_memory memory, size_t offset, size_t /*size*/) {
   vkBindBufferMemory(impl_->device_, impl_->handle_, memory, offset);
 }
 
-void buffer::unbind() {
-  vkBindBufferMemory(impl_->device_, impl_->handle_, VK_NULL_HANDLE, 0);
-}

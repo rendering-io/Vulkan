@@ -124,12 +124,6 @@ int main(int argc, char **argv) {
   queue.wait_idle();
   std::cout << "Done waiting for idle.\n";
 
-  // Unbind the memory, since it's destructor calls before the buffers.
-  a.unbind();
-  b.unbind();
-  c.unbind();
-
-
   return 0;
 }
 
