@@ -376,6 +376,10 @@ private:
 };
 
 class swapchain {
+public:
+  swapchain(device device);
+
+  operator VkSwapchainKHR();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

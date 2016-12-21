@@ -12,6 +12,7 @@ add_library(vk buffer.c++
                pipeline_layout.c++
                queue.c++
                shader_module.c++
-               surface.c++)
+               surface.c++
+               swapchain.c++)
 target_link_libraries(vk PUBLIC vulkan)
 
