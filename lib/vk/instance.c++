@@ -124,6 +124,10 @@ instance::instance()
   enumerate_physical_devices();
 }
 
+instance::operator VkInstance() {
+  return impl_->handle_;
+}
+
 void instance::enumerate_physical_devices() {
   assert(0 != impl_->handle_ && "Null instance handle.");
   

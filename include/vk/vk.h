@@ -51,6 +51,8 @@ public:
   using physical_device_iterator = std::vector<physical_device>::const_iterator;
   instance();
 
+  operator VkInstance();
+
   iterator_range<physical_device_iterator> physical_devices() const;
 private:
   void enumerate_physical_devices();
@@ -362,6 +364,12 @@ private:
 };
 
 class surface {
+public:
+#ifdef VK_USE_PLATFORM_XCB_KHR
+  surface(instance instance, xcb_connection_t* connection, xcb_window_t window);
+#endif // ifdef VK_USE_PLATFORM_XCB_KHR
+
+  operator VkSurfaceKHR();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
