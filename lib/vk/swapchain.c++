@@ -10,6 +10,7 @@ public:
 
   device device_;
   VkSwapchainKHR handle_;
+  std::vector<VkImage> images_;
 };
 
 swapchain::impl::impl(device device)
@@ -21,6 +22,9 @@ swapchain::impl::~impl() {
   if (VK_NULL_HANDLE != handle_)
     vkDestroySwapchainKHR(device_, handle_, nullptr);
 }
+
+swapchain_image::swapchain_image(swapchain swapchain, uint32_t index)
+: swapchain_{swapchain}, index_{index} { }
 
 swapchain::swapchain(device device, surface surface)
 : impl_{std::make_shared<impl>(std::move(device))} {
@@ -52,8 +56,24 @@ swapchain::swapchain(device device, surface surface)
   
   auto result = vkCreateSwapchainKHR(impl_->device_, &info, nullptr, &impl_->handle_);
   assert(VK_SUCCESS == result && "Swap chain creation failed.");
+
+  uint32_t count = 0;
+  result = vkGetSwapchainImagesKHR(impl_->device_, impl_->handle_, &count, nullptr);
+  if (VK_SUCCESS == result) {
+    impl_->images_.resize(count);
+    result = vkGetSwapchainImagesKHR(impl_->device_, impl_->handle_, &count, impl_->images_.data());
+  }
 }
 
 swapchain::operator VkSwapchainKHR() {
   return impl_->handle_;
 }
+
+swapchain_image swapchain::acquire_next_image() {
+  uint32_t index = 0;
+  auto result = vkAcquireNextImageKHR(impl_->device_, impl_->handle_, UINT64_MAX,
+                                      VK_NULL_HANDLE, VK_NULL_HANDLE, &index);
+  assert(VK_SUCCESS == result && "Failed to acquire swapchain image.");
+  return swapchain_image{*this, index};
+}
+

@@ -87,7 +87,9 @@ int main(int argc, char **argv) {
   
   // Start the event loop.
   while (handle_events(connection, wm_delete_window->atom)) {
-
+    // Grab an image and immediately present it.
+    auto image = swapchain.acquire_next_image();
+    queue.present(image);
   }
 
   queue.wait_idle();

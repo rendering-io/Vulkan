@@ -6,6 +6,7 @@ add_library(vk buffer.c++
                descriptor_set_layout.c++
                device.c++
                device_memory.c++
+	       image.c++
                instance.c++
                physical_device.c++
                pipeline.c++

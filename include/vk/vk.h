@@ -34,6 +34,7 @@ class frame_buffer;
 class command_pool;
 class surface;
 class swapchain;
+class swapchain_image;
 class display;
 class display_mode;
 
@@ -142,6 +143,7 @@ private:
   queue(VkQueue handle);
 public:
   void submit(command_buffer* buffers, size_t buffer_count);
+  void present(swapchain_image image);
   void wait_idle();
 private:
   VkQueue handle_;
@@ -222,8 +224,12 @@ void unmap_memory(device_memory memory);
 
 class image {
 private:
+  image(device device, VkImage handle, bool owns_handle);
+private:
   class impl;
   std::shared_ptr<impl> impl_;
+
+  friend class swapchain;
 };
 
 class event {
@@ -381,9 +387,22 @@ public:
   swapchain(device device, surface surface);
 
   operator VkSwapchainKHR();
+
+  swapchain_image acquire_next_image();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
+};
+
+class swapchain_image {
+private:
+  swapchain_image(swapchain chain, uint32_t index); 
+  
+  swapchain swapchain_;
+  uint32_t index_;
+
+  friend class queue;
+  friend class swapchain;
 };
 
 class display {};
