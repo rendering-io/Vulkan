@@ -10,6 +10,7 @@ public:
 
   device device_;
   VkBuffer handle_;
+  VkMemoryRequirements memory_requirements_;
 };
 
 buffer::impl::impl(device device)
@@ -38,6 +39,9 @@ buffer::buffer(device device, size_t size_in_bytes)
 
   auto result = vkCreateBuffer(impl_->device_, &info, nullptr, &impl_->handle_);
   assert(VK_SUCCESS == result && "Buffer creation failed.");
+
+  vkGetBufferMemoryRequirements(impl_->device_, impl_->handle_,
+                                &impl_->memory_requirements_);
 }
 
 buffer::operator VkBuffer() {
