@@ -127,10 +127,11 @@ private:
 
 class device {
 public:
-  device(const physical_device&);
+  device(const vk::physical_device&);
 
   operator VkDevice();
   queue get_queue(uint32_t family, uint32_t index);
+  const vk::physical_device& physical_device() const;
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -377,7 +378,7 @@ private:
 
 class swapchain {
 public:
-  swapchain(device device);
+  swapchain(device device, surface surface);
 
   operator VkSwapchainKHR();
 private:

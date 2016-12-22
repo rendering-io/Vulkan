@@ -22,33 +22,34 @@ swapchain::impl::~impl() {
     vkDestroySwapchainKHR(device_, handle_, nullptr);
 }
 
-swapchain::swapchain(device device)
+swapchain::swapchain(device device, surface surface)
 : impl_{std::make_shared<impl>(std::move(device))} {
+
+  // Query the surface capabilities.
+  VkSurfaceCapabilitiesKHR caps;
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(impl_->device_.physical_device(), surface, &caps);
 
   // Creation state for a swapchain.
   VkSwapchainCreateInfoKHR info;
-/*
-typedef struct VkSwapchainCreateInfoKHR {
-    VkStructureType                  sType;
-    const void*                      pNext;
-    VkSwapchainCreateFlagsKHR        flags;
-    VkSurfaceKHR                     surface;
-    uint32_t                         minImageCount;
-    VkFormat                         imageFormat;
-    VkColorSpaceKHR                  imageColorSpace;
-    VkExtent2D                       imageExtent;
-    uint32_t                         imageArrayLayers;
-    VkImageUsageFlags                imageUsage;
-    VkSharingMode                    imageSharingMode;
-    uint32_t                         queueFamilyIndexCount;
-    const uint32_t*                  pQueueFamilyIndices;
-    VkSurfaceTransformFlagBitsKHR    preTransform;
-    VkCompositeAlphaFlagBitsKHR      compositeAlpha;
-    VkPresentModeKHR                 presentMode;
-    VkBool32                         clipped;
-    VkSwapchainKHR                   oldSwapchain;
-} VkSwapchainCreateInfoKHR;
-*/
+  info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.surface = surface;
+  info.minImageCount = 3;
+  info.imageFormat = VK_FORMAT_R8G8B8_UNORM;
+  info.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+  info.imageExtent = caps.currentExtent;
+  info.imageArrayLayers = 1;
+  info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  info.queueFamilyIndexCount = 0;
+  info.pQueueFamilyIndices = nullptr;
+  info.preTransform = caps.currentTransform;
+  info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+  info.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+  info.clipped = VK_TRUE;
+  info.oldSwapchain = VK_NULL_HANDLE;
+  
   auto result = vkCreateSwapchainKHR(impl_->device_, &info, nullptr, &impl_->handle_);
   assert(VK_SUCCESS == result && "Swap chain creation failed.");
 }
