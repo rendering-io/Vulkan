@@ -35,6 +35,10 @@ void command_buffer::begin() {
   assert(VK_SUCCESS == result && "Error starting command buffer.");
 }
 
+command_buffer::operator VkCommandBuffer() {
+  return impl_->handle_;
+}
+
 void command_buffer::bind_descriptor_sets(pipeline_layout layout, 
                                           descriptor_set* descriptors, size_t descriptor_count) {
   std::vector<VkDescriptorSet> sets(descriptor_count);

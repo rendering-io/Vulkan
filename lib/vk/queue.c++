@@ -24,7 +24,24 @@ void queue::present(swapchain_image image) {
   assert(VK_SUCCESS == result && "Present failed.");
 }
 
-void queue::submit(command_buffer* buffers, size_t buffer_count) { }
+void queue::submit(command_buffer* buffers, size_t buffer_count) {
+  std::vector<VkCommandBuffer> command_bufs(buffer_count);
+  for (auto i = 0ul; i < buffer_count; ++i)
+    command_bufs[i] = buffers[i];
+
+  VkSubmitInfo info;
+  info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  info.pNext = nullptr;
+  info.waitSemaphoreCount = 0;
+  info.pWaitSemaphores = nullptr;
+  info.pWaitDstStageMask = nullptr;
+  info.commandBufferCount = buffer_count;
+  info.pCommandBuffers = command_bufs.data();
+  info.signalSemaphoreCount = 0;
+  info.pSignalSemaphores = nullptr;
+  auto result = vkQueueSubmit(handle_, 1, &info, VK_NULL_HANDLE);
+  assert(VK_SUCCESS == result && "Command buffer submission failed.");
+}
 
 void queue::wait_idle() {
   vkQueueWaitIdle(handle_);

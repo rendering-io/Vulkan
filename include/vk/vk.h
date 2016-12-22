@@ -184,6 +184,8 @@ private:
   command_buffer(device device, command_pool pool, VkCommandBuffer handle);
 
 public:
+  operator VkCommandBuffer();
+
   void begin();
   void end();
 
