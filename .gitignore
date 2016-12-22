@@ -1,4 +1,4 @@
 # Ignore the build directory
 build
 *.swp
-
+*.swo
