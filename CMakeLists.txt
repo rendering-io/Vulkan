@@ -16,6 +16,9 @@ if (${ENABLE_VALIDATION})
   add_definitions(-DENABLE_VALIDATION)
 endif()
 
+# Build the ext subdirectory.
+add_subdirectory(ext)
+
 # Build the lib subdirectory.
 add_subdirectory(lib)
 
