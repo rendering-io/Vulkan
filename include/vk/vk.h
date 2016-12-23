@@ -249,6 +249,9 @@ private:
 };
 
 class query_pool {
+public:
+  query_pool(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -273,6 +276,9 @@ private:
 };
 
 class pipeline_cache {
+public:
+  pipeline_cache(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -289,6 +295,9 @@ private:
 };
 
 class render_pass {
+public:
+  render_pass(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
