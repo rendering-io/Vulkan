@@ -174,6 +174,9 @@ private:
 };
 
 class semaphore {
+public:
+  semaphore(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -201,6 +204,9 @@ private:
 };
 
 class fence {
+public:
+  fence(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -235,6 +241,8 @@ private:
 };
 
 class event {
+public:
+  event(device device);
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -315,6 +323,9 @@ private:
 };
 
 class sampler {
+public:
+  sampler(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
