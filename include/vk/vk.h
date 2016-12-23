@@ -243,6 +243,9 @@ private:
 class event {
 public:
   event(device device);
+
+  void set();
+  void reset();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

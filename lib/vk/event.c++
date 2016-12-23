@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -22,3 +23,14 @@ event::impl::~impl() {
 
 event::event(device device)
 : impl_{std::make_shared<impl>(std::move(device))} { }
+
+void event::set() {
+  auto result = vkSetEvent(impl_->device_, impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to set event.");
+}
+
+void event::reset() {
+  auto result = vkResetEvent(impl_->device_, impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to reset event.");
+}
+
