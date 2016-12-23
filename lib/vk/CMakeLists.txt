@@ -9,7 +9,7 @@ add_library(vk buffer.c++
                device_memory.c++
 	       event.c++
 	       fence.c++
-               frame_buffer.c++
+               framebuffer.c++
 	       image.c++
                image_view.c++
                instance.c++
