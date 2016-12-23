@@ -255,12 +255,18 @@ private:
 };
 
 class buffer_view {
+public:
+  buffer_view(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
 };
 
 class image_view {
+public:
+  image_view(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
