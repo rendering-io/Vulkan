@@ -22,6 +22,9 @@ std::vector<uint32_t> load_shader(const char *path) {
 }
 
 int main(int argc, char **argv) {
+  // The number of elements to add.
+  const size_t ELEMENT_COUNT = 1024;
+
   // Create a Vulkan instance.
   vk::instance instance;
 
@@ -61,25 +64,34 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  // Create three buffers,
-  vk::buffer a{device, 1024};
-  vk::buffer b{device, 1024};
-  vk::buffer c{device, 1024};
+  // Create three buffers.
+  auto size_in_bytes = ELEMENT_COUNT * sizeof(uint32_t);
+  vk::buffer a{device, size_in_bytes};
+  vk::buffer b{device, size_in_bytes};
+  vk::buffer c{device, size_in_bytes};
 
   // We should be calling get_memory_requirements for each buffer here.
-  vk::device_memory storage{device, *best_memory_type, 3 * 1024};
-  a.bind(storage, 0, 1024);
-  b.bind(storage, 1024, 1024);
-  c.bind(storage, 2048, 1024);
+  vk::device_memory storage{device, *best_memory_type, 3 * size_in_bytes};
+  a.bind(storage, 0, size_in_bytes);
+  b.bind(storage, size_in_bytes, size_in_bytes);
+  c.bind(storage, 2 * size_in_bytes, size_in_bytes);
 
-  // Map the range of buffer b.
+  // Map the range of buffers a, b.
   void *ptr = nullptr;
-  if (map_memory(storage, 1024, 1024, &ptr)) {
-    unmap_memory(storage);
+  if (map_memory(storage, 0, size_in_bytes, &ptr)) {
+    uint32_t* as_uint32 = reinterpret_cast<uint32_t*>(ptr);
+    for (auto i = 0ul; i < ELEMENT_COUNT; ++i)
+      as_uint32[i] = i;
+
+   unmap_memory(storage);
   }
 
-  if (map_memory(storage, 2048, 1024, &ptr)) {
-    unmap_memory(storage);
+  if (map_memory(storage, size_in_bytes, size_in_bytes, &ptr)) {
+    uint32_t* as_uint32 = reinterpret_cast<uint32_t*>(ptr);
+    for (auto i = 0ul; i < ELEMENT_COUNT; ++i)
+      as_uint32[i] = i;
+
+   unmap_memory(storage);
   }
 
   // Load the shader module.
@@ -116,7 +128,7 @@ int main(int argc, char **argv) {
   cmd.begin();
   cmd.bind_pipeline(pipeline);
   cmd.bind_descriptor_sets(pipeline_layout, &descriptor, 1);
-  cmd.dispatch(256);
+  cmd.dispatch(ELEMENT_COUNT);
   cmd.end();
 
   // Submit and wait for the queue to be idle.
@@ -124,6 +136,18 @@ int main(int argc, char **argv) {
   queue.wait_idle();
   std::cout << "Done waiting for idle.\n";
 
+  // Validate results.
+  uint32_t correct = 0;
+  if (map_memory(storage, 2* size_in_bytes, size_in_bytes, &ptr)) {
+    uint32_t* as_uint32 = reinterpret_cast<uint32_t*>(ptr);
+    for (auto i = 0ul; i < ELEMENT_COUNT; ++i) {
+      if (as_uint32[i] == 2 * i)
+        ++correct;
+    }
+    unmap_memory(storage);
+  }
+
+  std::cout << correct << "/" << ELEMENT_COUNT << " results correct.\n";
   return 0;
 }
 

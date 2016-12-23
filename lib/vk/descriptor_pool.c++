@@ -42,7 +42,7 @@ void descriptor_set::update(descriptor_binding* bindings, size_t binding_count) 
   for (auto i = 0ul; i < writes.size(); ++i) {
     buffer_info[i].buffer = bindings[i].buf;
     buffer_info[i].offset = 0;
-    buffer_info[i].range = 16;//VK_WHOLE_SIZE;
+    buffer_info[i].range = VK_WHOLE_SIZE;
 
     writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writes[i].pNext = nullptr;
