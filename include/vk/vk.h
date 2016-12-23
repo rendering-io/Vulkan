@@ -30,7 +30,7 @@ class descriptor_set_layout;
 class sampler;
 class descriptor_pool;
 class descriptor_set;
-class frame_buffer;
+class framebuffer;
 class command_pool;
 class surface;
 class swapchain;
@@ -365,7 +365,10 @@ private:
   friend class descriptor_pool;
 };
 
-class frame_buffer {
+class framebuffer {
+public:
+  framebuffer(device device);
+
 private:
   class impl;
   std::shared_ptr<impl> impl_;
