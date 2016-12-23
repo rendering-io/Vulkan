@@ -22,6 +22,9 @@ add_subdirectory(ext)
 # Build the lib subdirectory.
 add_subdirectory(lib)
 
+# Build unit tests.
+add_subdirectory(test)
+
 # Build samples.
 add_subdirectory(samples)
 
