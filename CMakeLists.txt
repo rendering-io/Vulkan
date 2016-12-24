@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 
 # Declare some options for our build.
 option(ENABLE_VALIDATION "Enable Vulkan validation layers." ON)
+option(BUILD_UNITTESTS "Enable unit tests." ON)
 
 # We should generate a compilation database to help YouCompleteMe with autocompletion.
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
@@ -23,7 +24,9 @@ add_subdirectory(ext)
 add_subdirectory(lib)
 
 # Build unit tests.
-add_subdirectory(test)
+if(${BUILD_UNITTESTS})
+  add_subdirectory(test)
+endif()
 
 # Build samples.
 add_subdirectory(samples)

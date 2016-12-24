@@ -5,6 +5,7 @@
 # Add ExternalProject support.
 include(ExternalProject)
 
+if(${BUILD_UNITTESTS})
 set(GTEST_BUILD_DIR
     ${CMAKE_CURRENT_BINARY_DIR}/GoogleTest-prefix/src/GoogleTest-build) 
 set(GTEST_LOCATION ${GTEST_BUILD_DIR}/googlemock/gtest/libgtest.a)
@@ -44,4 +45,6 @@ set_target_properties(GTest PROPERTIES
 set_target_properties(GMock PROPERTIES
                       INTERFACE_INCLUDE_DIRECTORIES ${source_dir}/googlemock/include
                       INTERFACE_LINK_LIBRARIES "GMockLibrary;GTest"
-                      )
+		      )
+endif()
+
