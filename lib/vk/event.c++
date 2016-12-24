@@ -22,7 +22,15 @@ event::impl::~impl() {
 }
 
 event::event(device device)
-: impl_{std::make_shared<impl>(std::move(device))} { }
+: impl_{std::make_shared<impl>(std::move(device))} {
+  VkEventCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+
+  auto result = vkCreateEvent(impl_->device_, &info, nullptr, &impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to create event.");
+}
 
 void event::set() {
   auto result = vkSetEvent(impl_->device_, impl_->handle_);
