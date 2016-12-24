@@ -43,6 +43,11 @@ enum class index_type {
   uint32
 };
 
+enum class signal_status {
+  signaled,
+  unsignaled
+};
+
 // Explicitly binary compatible with VkPipelineStageFlagBits
 enum class pipeline_stage {
   top_of_pipe             = 0x00000001,
@@ -276,6 +281,7 @@ public:
   void reset();
   static void reset(fence *fences, uint32_t fence_count);
 
+  signal_status status() const;
   wait_result wait(uint64_t timeout);
   static wait_result wait_all(fence *fences, uint32_t fence_count,
                               uint64_t timeout) {
@@ -330,7 +336,9 @@ private:
 class event {
 public:
   event(device device);
-
+  
+  signal_status status() const;
+  
   void set();
   void reset();
 private:

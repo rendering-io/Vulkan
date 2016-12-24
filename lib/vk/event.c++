@@ -42,3 +42,17 @@ void event::reset() {
   assert(VK_SUCCESS == result && "Failed to reset event.");
 }
 
+signal_status event::status() const {
+  auto result = vkGetEventStatus(impl_->device_, impl_->handle_);
+  switch (result) {
+  case VK_EVENT_SET:
+    return signal_status::signaled;
+
+  case VK_EVENT_RESET:
+    return signal_status::unsignaled;
+
+  default:
+    assert(false && "Failure querying event status.");
+  }
+}
+

@@ -55,6 +55,20 @@ void fence::reset() {
   fence::reset(this, 1);
 }
 
+signal_status fence::status() const {
+  auto result = vkGetFenceStatus(impl_->device_, impl_->handle_);
+  switch(result) {
+  case VK_SUCCESS:
+    return signal_status::signaled;
+
+  case VK_NOT_READY:
+    return signal_status::unsignaled;
+
+  default:
+    assert(false && "Failure querying fence status.");
+  }
+}
+
 wait_result fence::wait(fence *fences, uint32_t fence_count, bool wait_all,
                  uint64_t timeout) {
   if (0 == fence_count)
