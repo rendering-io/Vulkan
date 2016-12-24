@@ -103,6 +103,9 @@ private:
   VkPhysicalDeviceMemoryProperties memory_properties_;
   std::vector<memory_type> memory_types_;
 
+  VkPhysicalDeviceProperties properties_;
+  VkPhysicalDeviceFeatures features_;
+
   friend class instance;
 };
 

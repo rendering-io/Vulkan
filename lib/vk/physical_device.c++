@@ -39,6 +39,11 @@ physical_device::physical_device(VkPhysicalDevice handle)
   if (0 == handle)
     return;
 
+  // Get the device properties and features.
+  vkGetPhysicalDeviceProperties(handle_, &properties_);
+  vkGetPhysicalDeviceFeatures(handle_, &features_);
+
+  // Get the queue families for the device.
   uint32_t count = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(handle_, &count, nullptr);
   std::vector<VkQueueFamilyProperties> properties(count);
