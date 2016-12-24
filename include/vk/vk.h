@@ -205,7 +205,7 @@ private:
 
 class fence {
 public:
-  fence(device device);
+  fence(device device, bool signaled);
 
 private:
   class impl;
