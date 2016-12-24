@@ -117,3 +117,8 @@ descriptor_set descriptor_pool::allocate(descriptor_set_layout layout) {
   return descriptor_set{impl_->device_, *this, handle};
 }
 
+void descriptor_pool::reset() {
+  auto result = vkResetDescriptorPool(impl_->device_, impl_->handle_, 0);
+  assert(VK_SUCCESS == result && "Failed to reset descriptor pool.");
+}
+

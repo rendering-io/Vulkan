@@ -452,6 +452,8 @@ public:
 
   operator VkDescriptorPool();
   descriptor_set allocate(descriptor_set_layout layout);
+
+  void reset();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
