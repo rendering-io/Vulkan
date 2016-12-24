@@ -168,6 +168,8 @@ public:
   operator VkDevice();
   queue get_queue(uint32_t family, uint32_t index);
   const vk::physical_device& physical_device() const;
+
+  void wait_idle();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

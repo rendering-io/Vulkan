@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -98,5 +99,10 @@ queue device::get_queue(uint32_t queue_family, uint32_t index) {
 
 const vk::physical_device& device::physical_device() const {
   return impl_->physical_dev_;
+}
+
+void device::wait_idle() {
+  auto result = vkDeviceWaitIdle(impl_->handle_);
+  assert(VK_SUCCESS == result && "Wait for device idle failed.");
 }
 
