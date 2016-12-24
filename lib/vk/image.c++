@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -24,5 +25,10 @@ image::impl::~impl() {
 
 image::image(device device, VkImage handle, bool owns_handle)
 : impl_{std::make_shared<impl>(device, handle, owns_handle)} {
+}
+
+void image::bind(device_memory memory, size_t offset, size_t /*size*/) {
+  auto result = vkBindImageMemory(impl_->device_, impl_->handle_, memory, offset);
+  assert(VK_SUCCESS == result && "Failed to bind image memory.");
 }
 

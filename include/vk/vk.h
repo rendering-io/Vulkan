@@ -233,6 +233,9 @@ void unmap_memory(device_memory memory);
 class image {
 private:
   image(device device, VkImage handle, bool owns_handle);
+
+public:
+  void bind(device_memory memory, size_t offset, size_t size);
 private:
   class impl;
   std::shared_ptr<impl> impl_;
