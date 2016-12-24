@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -21,4 +22,13 @@ semaphore::impl::~impl() {
 }
 
 semaphore::semaphore(device device)
-: impl_{std::make_shared<impl>(std::move(device))} { }
+: impl_{std::make_shared<impl>(std::move(device))} {
+  VkSemaphoreCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+
+  auto result = vkCreateSemaphore(impl_->device_, &info, nullptr, &impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to create semaphore");
+}
+
