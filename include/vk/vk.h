@@ -38,6 +38,11 @@ class swapchain_image;
 class display;
 class display_mode;
 
+enum class index_type {
+  uint16,
+  uint32
+};
+
 template<typename I>
 class iterator_range : std::pair<I, I> {
 public:
@@ -209,6 +214,7 @@ private:
 using stage_mask = uint32_t;
  
 class command_builder {
+  void bind_index_buffer(buffer buffer, size_t offset, index_type type);
   void dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1);
   void dispatch_indirect(buffer buffer, size_t offset = 0);
   void draw(uint32_t vertex_count, uint32_t instance_count,
@@ -219,6 +225,7 @@ class command_builder {
                      uint32_t draw_count, uint32_t stride);
   void draw_indexed_indirect(buffer buffer, size_t offset,
                              uint32_t draw_count, uint32_t stride);
+  void execute_commands(command_buffer* buffers, uint32_t buffer_count);
 
   void set_line_width(float width);
   void set_depth_bias(float constant_factor, float clamp, float slope_factor);
