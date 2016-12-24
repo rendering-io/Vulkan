@@ -211,6 +211,15 @@ using stage_mask = uint32_t;
 class command_builder {
   void dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1);
   void dispatch_indirect(buffer buffer, size_t offset = 0);
+  void draw(uint32_t vertex_count, uint32_t instance_count,
+            uint32_t first_vertex, uint32_t first_instance);
+  void draw_indexed(uint32_t index_count, uint32_t instance_count,
+                    uint32_t fisrt_index, int32_t vertex_offset, uint32_t first_instance);
+  void draw_indirect(buffer buffer, size_t offset,
+                     uint32_t draw_count, uint32_t stride);
+  void draw_indexed_indirect(buffer buffer, size_t offset,
+                             uint32_t draw_count, uint32_t stride);
+
   void set_line_width(float width);
   void set_depth_bias(float constant_factor, float clamp, float slope_factor);
   void set_event(event event, stage_mask mask);
