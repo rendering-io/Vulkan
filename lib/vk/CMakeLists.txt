@@ -2,6 +2,7 @@
 add_library(vk buffer.c++
                buffer_view.c++
                command_buffer.c++
+               command_builder.c++
                command_pool.c++
                descriptor_pool.c++
                descriptor_set_layout.c++

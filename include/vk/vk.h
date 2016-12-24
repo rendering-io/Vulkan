@@ -206,6 +206,16 @@ private:
   friend class command_pool;
 };
 
+using stage_mask = uint32_t;
+ 
+class command_builder {
+  void set_line_width(float width);
+  void set_depth_bias(float constant_factor, float clamp, float slope_factor);
+  void set_event(event event, stage_mask mask);
+private:
+  command_buffer buffer_;
+};
+
 enum class wait_result {
   SUCCESS,
   TIMEOUT
