@@ -307,14 +307,24 @@ private:
 };
 
 class pipeline {
-public:
-  pipeline(device device, pipeline_layout layout,
-           shader_module module, const char* entry_point);
+protected:
+  pipeline(device device);
 
+public:
   operator VkPipeline();
-private:
+
+protected:
   class impl;
   std::shared_ptr<impl> impl_;
+};
+
+class compute_pipeline: public pipeline {
+public:
+  compute_pipeline(device device, pipeline_layout layout,
+                   shader_module module, const char* entry_point);
+};
+
+class graphics_pipeline: public pipeline {
 };
 
 class descriptor_set_layout_binding {

@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
   vk::pipeline_layout pipeline_layout{device, &layout, 1}; 
 
   // Now construct a pipeline.
-  vk::pipeline pipeline{device, pipeline_layout, shader, "main"};
+  vk::compute_pipeline pipeline{device, pipeline_layout, shader, "main"};
 
   // While we have defined the layout of our descriptor set, we haven't 
   // actually bound the buffers into a concrete descriptor. Now we create

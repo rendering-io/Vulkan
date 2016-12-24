@@ -21,10 +21,16 @@ pipeline::impl::~impl() {
   }
 }
 
-pipeline::pipeline(device device, pipeline_layout layout,
-                   shader_module module, const char* entry_point)
-: impl_{std::make_shared<impl>(device)}
-{
+pipeline::pipeline(device device)
+: impl_{std::make_shared<impl>(device)} { }
+
+pipeline::operator VkPipeline() {
+  return impl_->handle_;
+}
+
+compute_pipeline::compute_pipeline(device device, pipeline_layout layout,
+                                   shader_module module, const char* entry_point)
+: pipeline{device} {
   VkPipelineCache cache = VK_NULL_HANDLE;
 
   VkPipelineShaderStageCreateInfo stage;
@@ -50,9 +56,5 @@ pipeline::pipeline(device device, pipeline_layout layout,
                                          nullptr, &impl_->handle_);
   assert(VK_SUCCESS == result &&
          "Failed to create compute pipeline.");
-}
-
-pipeline::operator VkPipeline() {
-  return impl_->handle_;
 }
 
