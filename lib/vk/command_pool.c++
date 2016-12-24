@@ -57,3 +57,13 @@ command_buffer command_pool::allocate() {
   return command_buffer{impl_->device_, *this, handle};
 }
 
+void command_pool::reset(bool release_resources) {
+  VkCommandPoolResetFlags flags = 0;
+  if (release_resources) {
+    flags |= VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT;
+  }
+
+  auto result = vkResetCommandPool(impl_->device_, impl_->handle_, flags);
+  assert(VK_SUCCESS == result && "Failed to reset command pool.");
+}
+

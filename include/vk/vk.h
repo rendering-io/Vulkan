@@ -496,6 +496,8 @@ public:
   operator VkCommandPool();
 
   command_buffer allocate();
+
+  void reset(bool release_resources);
 private:
   class impl;
   std::shared_ptr<impl> impl_;
