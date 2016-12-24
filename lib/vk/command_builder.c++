@@ -39,3 +39,7 @@ void command_builder::set_depth_bias(float constant_factor, float clamp, float s
   vkCmdSetDepthBias(buffer_, constant_factor, clamp, slope_factor);
 }
 
+void command_builder::set_depth_bounds(float min, float max) {
+  vkCmdSetDepthBounds(buffer_, min, max);
+}
+
