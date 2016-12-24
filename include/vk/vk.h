@@ -206,11 +206,34 @@ private:
   friend class command_pool;
 };
 
+enum class wait_result {
+  SUCCESS,
+  TIMEOUT
+};
+
 class fence {
 public:
   fence(device device, bool signaled);
 
+  void reset();
+  static void reset(fence *fences, uint32_t fence_count);
+
+  wait_result wait(uint64_t timeout);
+  static wait_result wait_all(fence *fences, uint32_t fence_count,
+                              uint64_t timeout) {
+    return wait(fences, fence_count, true, timeout);
+  }
+  static wait_result wait_any(fence *fences, uint32_t fence_count, 
+                              uint64_t timeout) {
+    return wait(fences, fence_count, false, timeout);
+  }
+
+  operator VkFence();
+
 private:
+  static wait_result wait(fence *fence, uint32_t fence_count, bool wait_all,
+                          uint64_t timeout);
+
   class impl;
   std::shared_ptr<impl> impl_;
 };
