@@ -1,6 +1,4 @@
-#define VK_USE_PLATFORM_XCB_KHR
 #include <vk/vk.h>
-#include <xcb/xcb.h>
 #include <iostream>
 #include <memory>
 

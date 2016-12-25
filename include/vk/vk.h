@@ -101,16 +101,19 @@ private:
 
 class queue_family {
 private:
-  queue_family(uint32_t index, uint32_t count, VkQueueFlags flags);
+  queue_family(physical_device &physical_device, uint32_t index, uint32_t count,
+               VkQueueFlags flags);
 public:
   bool is_graphics_queue() const;
   bool is_compute_queue() const;
   bool is_transfer_queue() const;
   bool is_present_queue() const;
+  bool is_presentation_supported(xcb_connection_t* connection, xcb_visualid_t visual) const;
   const uint32_t index;
   const uint32_t count;
 private:
   VkQueueFlags flags_;
+  physical_device &physical_device_;
 
   friend class physical_device;
 };

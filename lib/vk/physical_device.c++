@@ -2,9 +2,17 @@
 
 using namespace vk;
 
-queue_family::queue_family(uint32_t index, uint32_t count, VkQueueFlags flags)
-: index{index}, count{count}, flags_{flags}
+queue_family::queue_family(physical_device &physical_device, uint32_t index,
+                           uint32_t count, VkQueueFlags flags)
+: index{index}, count{count}, flags_{flags}, physical_device_{physical_device}
 { 
+}
+
+bool queue_family::is_presentation_supported(xcb_connection_t *connection,
+                                             xcb_visualid_t visual) const {
+  return vkGetPhysicalDeviceXcbPresentationSupportKHR(physical_device_,
+                                                      index, connection,
+                                                      visual);
 }
 
 physical_device::memory_type::memory_type(uint32_t index,
@@ -52,7 +60,7 @@ physical_device::physical_device(VkPhysicalDevice handle)
   queue_families_.reserve(count);
   for (uint32_t i = 0; i < count; ++i) {
 
-    queue_families_.emplace_back(queue_family{i, properties[i].queueCount,
+    queue_families_.emplace_back(queue_family{*this, i, properties[i].queueCount,
                                               properties[i].queueFlags});
   }
 
