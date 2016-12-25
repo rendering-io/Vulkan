@@ -108,7 +108,31 @@ public:
   bool is_compute_queue() const;
   bool is_transfer_queue() const;
   bool is_present_queue() const;
-  bool is_presentation_supported(xcb_connection_t* connection, xcb_visualid_t visual) const;
+
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+  bool is_presentation_supported(Display *display, VisualID visual) const;
+#endif
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
+  bool is_presentation_supported(xcb_connection_t *connection, xcb_visualid_t visual) const;
+#endif 
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+  bool is_presentation_supported(wl_display *display) const;
+#endif
+
+#ifdef VK_USE_PLATFORM_MIR_KHR
+  bool is_presentation_supported(MirConnection *connection) const;
+#endif
+
+#ifdef VK_USE_PLATFORM_ANDROID
+  bool is_presentation_supported() const;
+#endif
+
+#ifdef VK_USE_PLATFORM_WIN32
+  bool is_presentation_supported() const;
+#endif
+
   const uint32_t index;
   const uint32_t count;
 private:

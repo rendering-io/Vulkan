@@ -8,12 +8,49 @@ queue_family::queue_family(physical_device &physical_device, uint32_t index,
 { 
 }
 
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+bool queue_family::is_presentation_supported(Display *display,
+                                             VisualID visual) const {
+  return vkGetPhysicalDeviceXlibPresentationSupportKHR(physical_device_,
+                                                      index, display,
+                                                      visual);
+}
+#endif
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
 bool queue_family::is_presentation_supported(xcb_connection_t *connection,
                                              xcb_visualid_t visual) const {
   return vkGetPhysicalDeviceXcbPresentationSupportKHR(physical_device_,
                                                       index, connection,
                                                       visual);
 }
+#endif
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+bool queue_family::is_presentation_supported(wl_display *display) const {
+  return vkGetPhysicalDeviceWaylandPresentationSupportKHR(physical_device_,
+                                                          index, display);
+}
+#endif
+
+#ifdef VK_USE_PLATFORM_MIR_KHR
+bool queue_family::is_presentation_supported(iMirConnection *connection) const {
+  return vkGetPhysicalDeviceMirPresentationSupportKHR(physical_device_,
+                                                      index, connection);
+}
+#endif
+
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+bool queue_family::is_presentation_supported() const {
+  return true;
+}
+#endif
+
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+bool queue_family::is_presentation_supported() const {
+  return vkGetPhysicalDeviceWin32PresentationSupportKHR(physical_device_, index);
+}
+#endif
 
 physical_device::memory_type::memory_type(uint32_t index,
                                           const VkMemoryType& type,
