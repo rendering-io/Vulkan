@@ -38,6 +38,19 @@ class swapchain_image;
 class display;
 class display_mode;
 
+enum class image_layout {
+  undefined                = VK_IMAGE_LAYOUT_UNDEFINED,
+  general                  = VK_IMAGE_LAYOUT_GENERAL,
+  color_attachment         = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+  depth_stencil_attachment = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+  depth_stencil_readonly   = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+  shader_readonly          = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+  transfer_source          = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+  transfer_destination     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+  preinitialized           = VK_IMAGE_LAYOUT_PREINITIALIZED,
+  present_source           = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+};
+
 enum class index_type {
   uint16,
   uint32
