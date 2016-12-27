@@ -422,6 +422,7 @@ class image_view {
 public:
   image_view(device device);
 
+  operator VkImageView();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -450,6 +451,7 @@ class render_pass {
 public:
   render_pass(device device);
 
+  operator VkRenderPass();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -546,7 +548,9 @@ private:
 
 class framebuffer {
 public:
-  framebuffer(device device);
+  framebuffer(device device, render_pass pass,
+              image_view *attachments, size_t attachment_count,
+              uint32_t width, uint32_t height, uint32_t layers);
 
 private:
   class impl;
