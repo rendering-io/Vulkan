@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -20,5 +21,16 @@ pipeline_cache::impl::~impl() {
   }
 }
 
-pipeline_cache::pipeline_cache(device device)
-: impl_{std::make_shared<impl>(std::move(device))} { }
+pipeline_cache::pipeline_cache(device device, const void* data, size_t size_in_bytes)
+: impl_{std::make_shared<impl>(std::move(device))} {
+  VkPipelineCacheCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.initialDataSize = size_in_bytes;
+  info.pInitialData = data;
+
+  auto result = vkCreatePipelineCache(impl_->device_, &info, nullptr, &impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to create pipeline cache.");
+}
+

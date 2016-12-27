@@ -430,7 +430,7 @@ private:
 
 class pipeline_cache {
 public:
-  pipeline_cache(device device);
+  pipeline_cache(device device, const void *data, size_t size_in_bytes);
 
 private:
   class impl;
