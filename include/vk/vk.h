@@ -296,6 +296,7 @@ class command_builder {
                      uint32_t draw_count, uint32_t stride);
   void draw_indexed_indirect(buffer buffer, size_t offset,
                              uint32_t draw_count, uint32_t stride);
+  void end_query(query_pool pool, uint32_t index);
   void end_render_pass();
   void execute_commands(command_buffer* buffers, uint32_t buffer_count);
   void fill_buffer(buffer buffer, size_t offset, uint32_t value, ssize_t size);
@@ -389,6 +390,7 @@ class query_pool {
 public:
   query_pool(device device);
 
+  operator VkQueryPool();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

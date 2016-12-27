@@ -50,6 +50,10 @@ void command_builder::draw_indexed_indirect(buffer buffer, size_t offset,
   vkCmdDrawIndexedIndirect(buffer_, buffer, offset, draw_count, stride);
 }  
 
+void command_builder::end_query(query_pool pool, uint32_t index) {
+  vkCmdEndQuery(buffer_, pool, index);
+}
+
 void command_builder::end_render_pass() {
   vkCmdEndRenderPass(buffer_);
 }
