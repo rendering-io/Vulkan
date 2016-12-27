@@ -432,6 +432,11 @@ class pipeline_cache {
 public:
   pipeline_cache(device device, const void *data, size_t size_in_bytes);
 
+  operator VkPipelineCache();
+
+  void merge(pipeline_cache *caches, size_t cache_count);
+  size_t size() const;
+  std::vector<uint8_t> data() const;
 private:
   class impl;
   std::shared_ptr<impl> impl_;
