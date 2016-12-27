@@ -147,11 +147,11 @@ public:
   bool is_presentation_supported(MirConnection *connection) const;
 #endif
 
-#ifdef VK_USE_PLATFORM_ANDROID
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
   bool is_presentation_supported() const;
 #endif
 
-#ifdef VK_USE_PLATFORM_WIN32
+#ifdef VK_USE_PLATFORM_WIN32_KHR
   bool is_presentation_supported() const;
 #endif
 
@@ -572,6 +572,10 @@ public:
 #ifdef VK_USE_PLATFORM_XCB_KHR
   surface(instance instance, xcb_connection_t* connection, xcb_window_t window);
 #endif // ifdef VK_USE_PLATFORM_XCB_KHR
+
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+  surface(instance instance, ANativeWindow *window);
+#endif
 
   operator VkSurfaceKHR();
 private:
