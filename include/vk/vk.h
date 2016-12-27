@@ -75,6 +75,15 @@ inline pipeline_stage operator|(pipeline_stage lhs, pipeline_stage rhs) {
   return static_cast<pipeline_stage>(static_cast<T>(lhs) | static_cast<T>(rhs));
 }
 
+struct viewport {
+  float x;
+  float y;
+  float width;
+  float heightl
+  float min_depth;
+  float max_depth;
+};
+
 template<typename I>
 class iterator_range : std::pair<I, I> {
 public:
