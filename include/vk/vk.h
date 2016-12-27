@@ -288,7 +288,7 @@ class command_builder {
   void draw_indexed_indirect(buffer buffer, size_t offset,
                              uint32_t draw_count, uint32_t stride);
   void execute_commands(command_buffer* buffers, uint32_t buffer_count);
-
+  void fill_buffer(buffer buffer, size_t offset, uint32_t value, ssize_t size);
   void set_line_width(float width);
   void set_depth_bias(float constant_factor, float clamp, float slope_factor);
   void set_depth_bounds(float min, float max);

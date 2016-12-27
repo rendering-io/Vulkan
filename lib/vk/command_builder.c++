@@ -58,6 +58,13 @@ void command_builder::execute_commands(command_buffer* buffers, uint32_t buffer_
   vkCmdExecuteCommands(buffer_, cmd_buffers.size(), cmd_buffers.data());
 }
 
+void command_builder::fill_buffer(buffer buffer, size_t offset, uint32_t value, ssize_t size) {
+  if (size < 0)
+    size = VK_WHOLE_SIZE;
+
+  vkCmdFillBuffer(buffer_, buffer, offset, size, value);
+}
+
 void command_builder::set_line_width(float width) {
   vkCmdSetLineWidth(buffer_, width);
 }
