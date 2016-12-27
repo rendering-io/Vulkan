@@ -41,7 +41,7 @@ surface::surface(instance instance,
 #endif
 
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
-surface::surface(instance instance, ANativeWindow *window) {
+surface::surface(instance instance, ANativeWindow *window)
 : impl_{std::make_shared<impl>(std::move(instance))} {
 
   VkAndroidSurfaceCreateInfoKHR info;
