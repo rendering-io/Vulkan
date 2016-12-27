@@ -50,6 +50,10 @@ void command_builder::draw_indexed_indirect(buffer buffer, size_t offset,
   vkCmdDrawIndexedIndirect(buffer_, buffer, offset, draw_count, stride);
 }  
 
+void command_builder::end_render_pass() {
+  vkCmdEndRenderPass(buffer_);
+}
+
 void command_builder::execute_commands(command_buffer* buffers, uint32_t buffer_count) {
   std::vector<VkCommandBuffer> cmd_buffers(buffer_count);
   for (auto i = 0u; i < buffer_count; ++i) {
