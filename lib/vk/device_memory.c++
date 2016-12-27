@@ -39,6 +39,12 @@ device_memory::operator VkDeviceMemory() {
   return impl_->handle_;
 }
 
+size_t device_memory::get_commitment() const {
+  size_t size_in_bytes = 0;
+  vkGetDeviceMemoryCommitment(impl_->device_, impl_->handle_, &size_in_bytes);
+  return size_in_bytes;
+}
+
 bool vk::map_memory(device_memory memory, size_t offset, size_t size, void **ptr) {
  auto result = vkMapMemory(memory.impl_->device_,
                            memory, offset, size, 0, ptr);

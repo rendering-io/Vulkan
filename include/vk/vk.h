@@ -359,6 +359,7 @@ class device_memory {
 public:
   device_memory(device, const physical_device::memory_type&, size_t); 
 
+  size_t get_commitment() const;
 public:
   operator VkDeviceMemory();
 
