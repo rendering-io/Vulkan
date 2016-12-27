@@ -65,7 +65,6 @@ void command_buffer::reset(bool release_all) {
   assert(VK_SUCCESS == result && "Failed to reset command buffer.");
 }
 
-
 void command_buffer::dispatch(uint32_t x, uint32_t y, uint32_t z) {
   vkCmdDispatch(impl_->handle_, x, y, z);
 }
