@@ -573,13 +573,29 @@ private:
 
 class surface {
 public:
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+  surface(instance instance, Display *display, Window window);
+#endif 
+
 #ifdef VK_USE_PLATFORM_XCB_KHR
   surface(instance instance, xcb_connection_t* connection, xcb_window_t window);
-#endif // ifdef VK_USE_PLATFORM_XCB_KHR
+#endif
+
+#ifdef VK_USE_PLATFORM_MIR_KHR
+  surface(instance instance, MirConnection *connection, MirSurface *surface);
+#endif 
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+  surface(instance instance, wl_display *display, wl_surface *surface);
+#endif 
 
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
   surface(instance instance, ANativeWindow *window);
 #endif
+
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+  surface(instance instance, HINSTANCE instance, HWND window);
+#endif 
 
   operator VkSurfaceKHR();
 private:
