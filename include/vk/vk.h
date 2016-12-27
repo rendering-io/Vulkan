@@ -260,6 +260,7 @@ public:
 
   void begin();
   void end();
+  void reset(bool release_all);
 
   void bind_pipeline(pipeline pipeline);
   void bind_descriptor_sets(pipeline_layout layout, descriptor_set* sets, size_t count);

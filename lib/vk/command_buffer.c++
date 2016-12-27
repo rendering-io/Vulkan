@@ -58,6 +58,14 @@ void command_buffer::end() {
   assert(VK_SUCCESS == result && "Error completing command buffer.");
 }
 
+void command_buffer::reset(bool release_all) {
+  VkCommandBufferResetFlags flags =
+    release_all ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0;
+  auto result = vkResetCommandBuffer(impl_->handle_, flags);
+  assert(VK_SUCCESS == result && "Failed to reset command buffer.");
+}
+
+
 void command_buffer::dispatch(uint32_t x, uint32_t y, uint32_t z) {
   vkCmdDispatch(impl_->handle_, x, y, z);
 }
