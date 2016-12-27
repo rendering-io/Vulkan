@@ -79,7 +79,7 @@ struct viewport {
   float x;
   float y;
   float width;
-  float heightl
+  float height;
   float min_depth;
   float max_depth;
 };
@@ -302,6 +302,7 @@ class command_builder {
   void set_depth_bias(float constant_factor, float clamp, float slope_factor);
   void set_depth_bounds(float min, float max);
   void set_event(event event, stage_mask mask);
+  void set_viewports(viewport *viewports, size_t viewport_count);
 private:
   command_buffer buffer_;
 };

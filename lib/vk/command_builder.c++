@@ -77,3 +77,7 @@ void command_builder::set_depth_bounds(float min, float max) {
   vkCmdSetDepthBounds(buffer_, min, max);
 }
 
+void command_builder::set_viewports(viewport *viewports, size_t viewport_count) {
+  vkCmdSetViewport(buffer_, 0, viewport_count, reinterpret_cast<VkViewport*>(viewports));
+}
+
