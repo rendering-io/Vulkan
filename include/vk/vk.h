@@ -329,6 +329,7 @@ public:
   bool is_transfer_queue() const;
   bool is_present_queue() const;
 
+  bool is_surface_supported(surface surface) const;
 #ifdef VK_USE_PLATFORM_XLIB_KHR
   bool is_presentation_supported(Display *display, VisualID visual) const;
 #endif
@@ -377,6 +378,7 @@ public:
 
   memory_type_range memory_types() const;
   queue_family_range queue_families() const;
+  void surface_formats(surface surface) const;
 private: 
   VkPhysicalDevice handle_;
 

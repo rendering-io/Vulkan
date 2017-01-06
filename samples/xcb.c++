@@ -64,21 +64,30 @@ int main(int argc, char **argv) {
     std::cerr << "No Vulkan compatible devices found. Exiting...\n";
     return -1;
   }
-  
+
+  // Create a surface.
+  vk::surface surface{instance, connection, window};
+ 
   // We now need to query the device for supported queue familes and decide
   // what queues we need to construct.
   const vk::queue_family *family = nullptr;
   for (auto &queue_family: best_physical_device->queue_families()) {
-    family = &queue_family;
-    break;
+    std::cout << "Queue fam\n";
+    if (queue_family.is_surface_supported(surface)/*1 || queue_family.is_presentation_supported(connection, window)*/) {
+      family = &queue_family;
+      break;
+    }
   }
-  
+ 
+  if (nullptr == family) {
+    std::cerr << "No queue family supporting presentation found. Exiting...\n";
+  }
+
   // Now we can create a logical device.
   vk::device device{*best_physical_device};
   vk::queue queue = device.get_queue(family->index, 0);
 
-  // Create a surface.
-  vk::surface surface{instance, connection, window};
+  best_physical_device->surface_formats(surface);
 
   // Create a swap chain.
   vk::swapchain swapchain{device, surface};

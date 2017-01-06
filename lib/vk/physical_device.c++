@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -6,6 +7,15 @@ queue_family::queue_family(physical_device &physical_device, uint32_t index,
                            uint32_t count, VkQueueFlags flags)
 : index{index}, count{count}, flags_{flags}, physical_device_{physical_device}
 { 
+}
+
+bool queue_family::is_surface_supported(surface surface) const {
+  VkBool32 supported = false;
+  auto result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_device_, index,
+                                                     surface, &supported);
+  assert(VK_SUCCESS == result && "Failure querying queue family support for surface.");
+
+  return supported;
 }
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
@@ -120,5 +130,15 @@ physical_device::queue_family_range physical_device::queue_families() const {
   return queue_family_range{
     queue_families_.begin(), queue_families_.end()
   };
+}
+
+void physical_device::surface_formats(surface surface) const {
+  uint32_t count = 0;
+  auto result = vkGetPhysicalDeviceSurfaceFormatsKHR(*this, surface, &count, nullptr);
+  if (VK_SUCCESS == result) {
+    std::vector<VkSurfaceFormatKHR> formats(count);
+    auto result = vkGetPhysicalDeviceSurfaceFormatsKHR(*this, surface, &count, formats.data());
+    assert(VK_SUCCESS == result);
+  }
 }
 
