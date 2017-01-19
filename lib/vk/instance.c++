@@ -27,7 +27,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report_callback(VkDebugReportFlagsEX
   if (VK_DEBUG_REPORT_DEBUG_BIT_EXT & flags)
     return VK_FALSE;
 
-  std::cout << flags << '\n';
   std::cout << msg << '\n';
 
   if (VK_DEBUG_REPORT_ERROR_BIT_EXT &flags)

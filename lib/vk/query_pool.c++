@@ -22,3 +22,8 @@ query_pool::impl::~impl() {
 
 query_pool::query_pool(device device)
 : impl_{std::make_shared<impl>(std::move(device))} { }
+
+query_pool::operator VkQueryPool() {
+  return impl_->handle_;
+}
+

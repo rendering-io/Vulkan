@@ -3,6 +3,9 @@
 
 using namespace vk;
 
+command_builder::command_builder(command_buffer &buffer)
+: buffer_{buffer} { }
+
 void command_builder::bind_index_buffer(buffer buffer, size_t offset, index_type type) {
   VkIndexType vk_index_type;
   switch (type) {
@@ -71,6 +74,41 @@ void command_builder::fill_buffer(buffer buffer, size_t offset, uint32_t value, 
     size = VK_WHOLE_SIZE;
 
   vkCmdFillBuffer(buffer_, buffer, offset, size, value);
+}
+
+void command_builder::pipeline_barrier(const memory_barrier *barriers,
+                                       uint32_t barrier_count,
+                                       const buffer_memory_barrier *buffer_barriers,
+                                       uint32_t buffer_barrier_count,
+                                       const image_memory_barrier *image_barriers, 
+                                       uint32_t image_barrier_count,image image ) {
+  VkPipelineStageFlags src_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  VkPipelineStageFlags dst_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  VkDependencyFlags dependency_flags = 0;
+  std::vector<VkMemoryBarrier> barrier_buf;
+  std::vector<VkBufferMemoryBarrier> buffer_barrier_buf;
+  std::vector<VkImageMemoryBarrier> image_barrier_buf;
+
+  VkImageMemoryBarrier barrier;
+  barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER; 
+  barrier.pNext = nullptr;
+  barrier.srcAccessMask = 0;
+  barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+  barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+  barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  barrier.image = image;
+  barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+  barrier.subresourceRange.baseMipLevel = 0;
+  barrier.subresourceRange.levelCount = 1;
+  barrier.subresourceRange.baseArrayLayer = 0;
+  barrier.subresourceRange.layerCount = 1;
+
+  vkCmdPipelineBarrier(buffer_, src_stage_flags, dst_stage_flags, dependency_flags,
+                       barrier_count, barrier_buf.data(),
+                       buffer_barrier_count, buffer_barrier_buf.data(),
+                       /*image_barrier_count*/1, &barrier/*image_barrier_buf.data()*/);
 }
 
 void command_builder::set_line_width(float width) {

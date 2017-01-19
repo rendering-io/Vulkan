@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 #include <iostream>
 #include <memory>
 
@@ -21,6 +22,12 @@ bool handle_events(xcb_connection_t* connection, xcb_atom_t wm_delete_window) {
   }
 
   return run;
+}
+
+auto choose_swapchain_format(const vk::physical_device &device, vk::surface surface) {
+  auto formats = device.surface_formats(surface);
+  assert(formats.size() > 0);
+  return formats[0];
 }
 
 int main(int argc, char **argv) {
@@ -87,16 +94,30 @@ int main(int argc, char **argv) {
   vk::device device{*best_physical_device};
   vk::queue queue = device.get_queue(family->index, 0);
 
-  best_physical_device->surface_formats(surface);
+  // Now choose our display surface format.
+  auto format = choose_swapchain_format(*best_physical_device, surface);
 
   // Create a swap chain.
-  vk::swapchain swapchain{device, surface};
-  
+  vk::swapchain swapchain{device, surface, format};
+
+  // Create the command buffer pool.
+  vk::command_pool command_pool{device, family->index};
+  vk::command_buffer command_buffer = command_pool.allocate();
+ // command_buffer.record([](vk::command_builder& builder) {
+//    builder.pipeline_barrier(nullptr, 0, nullptr, 0, nullptr, 0);
+//  });
+
   // Start the event loop.
   while (handle_events(connection, wm_delete_window->atom)) {
     // Grab an image and immediately present it.
     auto image = swapchain.acquire_next_image();
+    command_buffer.record([&](vk::command_builder& builder) {
+      builder.pipeline_barrier(nullptr, 0, nullptr, 0, nullptr, 0, image);
+    });
+
+    queue.submit(&command_buffer, 1);
     queue.present(image);
+    queue.wait_idle();
   }
 
   queue.wait_idle();

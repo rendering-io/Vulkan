@@ -132,13 +132,23 @@ physical_device::queue_family_range physical_device::queue_families() const {
   };
 }
 
-void physical_device::surface_formats(surface surface) const {
+std::vector<surface_format> physical_device::surface_formats(surface surface) const {
+  std::vector<surface_format> surface_formats;
+  
   uint32_t count = 0;
   auto result = vkGetPhysicalDeviceSurfaceFormatsKHR(*this, surface, &count, nullptr);
   if (VK_SUCCESS == result) {
     std::vector<VkSurfaceFormatKHR> formats(count);
     auto result = vkGetPhysicalDeviceSurfaceFormatsKHR(*this, surface, &count, formats.data());
-    assert(VK_SUCCESS == result);
+    if (VK_SUCCESS == result) {
+      for (auto &fmt: formats) {
+        // We relying on the Vulkan enums being bitwise matches to ours.
+        surface_format tmp{static_cast<image_format>(fmt.format)};
+        surface_formats.emplace_back(tmp);
+      }
+    }
   }
+
+  return surface_formats;
 }
 

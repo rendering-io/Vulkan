@@ -15,6 +15,7 @@ class shader_module;
 class buffer;
 class semaphore;
 class command_buffer;
+class command_builder;
 class fence;
 class device_memory;
 class image;
@@ -38,6 +39,10 @@ class swapchain_image;
 class display;
 class display_mode;
 
+class memory_barrier;
+class buffer_memory_barrier;
+class image_memory_barrier;
+
 enum class image_layout {
   undefined                = VK_IMAGE_LAYOUT_UNDEFINED,
   general                  = VK_IMAGE_LAYOUT_GENERAL,
@@ -51,7 +56,7 @@ enum class image_layout {
   present_source           = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 };
 
-enum class format : uint32_t {
+enum class image_format : uint32_t {
   undefined = VK_FORMAT_UNDEFINED,
   r4g4_unorm_pack8 = VK_FORMAT_R4G4_UNORM_PACK8,
   r4g4b4a4_unorm_pack16 = VK_FORMAT_R4G4B4A4_UNORM_PACK16,
@@ -295,6 +300,10 @@ struct viewport {
   float max_depth;
 };
 
+struct surface_format {
+  image_format format;
+};
+
 template<typename I>
 class iterator_range : std::pair<I, I> {
 public:
@@ -378,7 +387,7 @@ public:
 
   memory_type_range memory_types() const;
   queue_family_range queue_families() const;
-  void surface_formats(surface surface) const;
+  std::vector<surface_format> surface_formats(surface surface) const;
 private: 
   VkPhysicalDevice handle_;
 
@@ -488,6 +497,13 @@ public:
   void bind_descriptor_sets(pipeline_layout layout, descriptor_set* sets, size_t count);
   void dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1);
 
+  template<typename F>
+  void record(F f) {
+    command_builder builder{*this};
+    begin();
+    f(builder);
+    end();
+  }
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -498,6 +514,10 @@ private:
 using stage_mask = uint32_t;
  
 class command_builder {
+private:
+  command_builder(command_buffer &buffer);
+
+public:
   void bind_index_buffer(buffer buffer, size_t offset, index_type type);
   void dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1);
   void dispatch_indirect(buffer buffer, size_t offset = 0);
@@ -513,13 +533,21 @@ class command_builder {
   void end_render_pass();
   void execute_commands(command_buffer* buffers, uint32_t buffer_count);
   void fill_buffer(buffer buffer, size_t offset, uint32_t value, ssize_t size);
+  void pipeline_barrier(const memory_barrier *barriers,
+                        uint32_t barrier_count,
+                        const buffer_memory_barrier * buffer_barriers,
+                        uint32_t buffer_barrier_count,
+                        const image_memory_barrier *image_barriers,
+                        uint32_t image_barrier_count, image image);
   void set_line_width(float width);
   void set_depth_bias(float constant_factor, float clamp, float slope_factor);
   void set_depth_bounds(float min, float max);
   void set_event(event event, stage_mask mask);
   void set_viewports(viewport *viewports, size_t viewport_count);
 private:
-  command_buffer buffer_;
+  command_buffer &buffer_;
+
+  friend class command_buffer;
 };
 
 enum class wait_result {
@@ -575,16 +603,18 @@ bool map_memory(device_memory, size_t, size_t, void **);
 void unmap_memory(device_memory memory);
 
 class image {
-private:
+protected:
   image(device device, VkImage handle, bool owns_handle);
 
 public:
   void bind(device_memory memory, size_t offset, size_t size);
+  size_t minimum_allocation_size() const;
+  size_t minimum_allocation_alignment() const;
+
+  operator VkImage();
 private:
   class impl;
   std::shared_ptr<impl> impl_;
-
-  friend class swapchain;
 };
 
 class event {
@@ -811,7 +841,7 @@ private:
 
 class swapchain {
 public:
-  swapchain(device device, surface surface);
+  swapchain(device device, surface surface, surface_format format);
 
   operator VkSwapchainKHR();
 
@@ -821,9 +851,9 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
-class swapchain_image {
+class swapchain_image : public image {
 private:
-  swapchain_image(swapchain chain, uint32_t index); 
+  swapchain_image(device device, swapchain chain, VkImage handle, uint32_t index); 
   
   swapchain swapchain_;
   uint32_t index_;
