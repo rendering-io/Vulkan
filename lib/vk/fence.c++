@@ -89,6 +89,7 @@ wait_result fence::wait(fence *fences, uint32_t fence_count, bool wait_all,
     return wait_result::TIMEOUT;
   default:
     assert(false && "Error waiting for fence.");
+    abort();
   }
 }
 

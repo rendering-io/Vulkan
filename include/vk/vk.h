@@ -712,6 +712,9 @@ public:
 };
 
 class graphics_pipeline: public pipeline {
+public:
+  graphics_pipeline(device device, pipeline_layout layout, 
+                    render_pass render_pass);
 };
 
 class descriptor_set_layout_binding {

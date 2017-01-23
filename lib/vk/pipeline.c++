@@ -58,3 +58,36 @@ compute_pipeline::compute_pipeline(device device, pipeline_layout layout,
          "Failed to create compute pipeline.");
 }
 
+graphics_pipeline::graphics_pipeline(device device, pipeline_layout layout,
+                                     render_pass render_pass)
+: pipeline{device} {
+  VkPipelineCache cache = VK_NULL_HANDLE;
+
+  VkPipelineCreateFlags flags = 0;
+  VkGraphicsPipelineCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = flags;
+  info.stageCount = 0;
+  info.pStages    = nullptr;
+  info.pVertexInputState = nullptr;
+  info.pInputAssemblyState = nullptr;
+  info.pTessellationState = nullptr;
+  info.pViewportState = nullptr;
+  info.pRasterizationState = nullptr;
+  info.pMultisampleState = nullptr;
+  info.pDepthStencilState = nullptr;
+  info.pColorBlendState = nullptr;
+  info.pDynamicState = nullptr;
+  info.layout = layout;
+  info.renderPass = render_pass;
+  info.subpass = 0;
+  info.basePipelineHandle = VK_NULL_HANDLE;
+  info.basePipelineIndex = -1;
+
+  auto result = vkCreateGraphicsPipelines(impl_->device_, cache, 1, &info,
+                                          nullptr, &impl_->handle_);
+  assert(VK_SUCCESS == result &&
+         "Failed to create graphics pipeline.");
+}
+

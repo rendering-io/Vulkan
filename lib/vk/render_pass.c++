@@ -22,3 +22,7 @@ render_pass::impl::~impl() {
 
 render_pass::render_pass(device device)
 : impl_{std::make_shared<impl>(std::move(device))} { }
+
+render_pass::operator VkRenderPass() {
+  return impl_->handle_;
+}
