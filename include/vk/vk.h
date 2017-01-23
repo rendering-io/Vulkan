@@ -602,6 +602,14 @@ private:
 bool map_memory(device_memory, size_t, size_t, void **);
 void unmap_memory(device_memory memory);
 
+class image_subresource {
+  
+};
+
+class image_subresource_range {
+  
+};
+
 class image {
 protected:
   image(device device, VkImage handle, bool owns_handle);
