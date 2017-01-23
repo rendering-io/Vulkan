@@ -56,7 +56,7 @@ enum class image_layout {
   present_source           = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 };
 
-enum class image_format : uint32_t {
+enum class texel_format: uint32_t {
   undefined = VK_FORMAT_UNDEFINED,
   r4g4_unorm_pack8 = VK_FORMAT_R4G4_UNORM_PACK8,
   r4g4b4a4_unorm_pack16 = VK_FORMAT_R4G4B4A4_UNORM_PACK16,
@@ -301,7 +301,7 @@ struct viewport {
 };
 
 struct surface_format {
-  image_format format;
+  texel_format format;
 };
 
 template<typename I>
@@ -642,7 +642,7 @@ private:
 
 class buffer_view {
 public:
-  buffer_view(device device);
+  buffer_view(device device, buffer buffer, texel_format format, size_t offset, size_t range);
 
 private:
   class impl;

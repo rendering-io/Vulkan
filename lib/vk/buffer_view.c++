@@ -1,4 +1,5 @@
 #include <vk/vk.h>
+#include <cassert>
 
 using namespace vk;
 
@@ -20,5 +21,21 @@ buffer_view::impl::~impl() {
   }
 }
 
-buffer_view::buffer_view(device device)
-: impl_{std::make_shared<impl>(std::move(device))} { }
+buffer_view::buffer_view(device device, buffer buffer, texel_format format,
+                         size_t offset, size_t range)
+: impl_{std::make_shared<impl>(std::move(device))}
+{
+  VkBufferViewCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.buffer = buffer;
+  info.format = static_cast<VkFormat>(format);
+  info.offset = offset;
+  info.range = range;
+
+  auto result = vkCreateBufferView(impl_->device_, &info, nullptr, 
+                                   &impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to create buffer view.");
+}
+

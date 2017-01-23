@@ -143,7 +143,7 @@ std::vector<surface_format> physical_device::surface_formats(surface surface) co
     if (VK_SUCCESS == result) {
       for (auto &fmt: formats) {
         // We relying on the Vulkan enums being bitwise matches to ours.
-        surface_format tmp{static_cast<image_format>(fmt.format)};
+        surface_format tmp{static_cast<texel_format>(fmt.format)};
         surface_formats.emplace_back(tmp);
       }
     }
