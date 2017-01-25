@@ -554,6 +554,7 @@ public:
   void set_depth_bounds(float min, float max);
   void set_event(event event, stage_mask mask);
   void set_viewports(viewport *viewports, size_t viewport_count);
+  void update_buffer(buffer dst, size_t offset, const void *src, size_t size);
 private:
   command_buffer &buffer_;
 

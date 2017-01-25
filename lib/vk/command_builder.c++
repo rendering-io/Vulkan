@@ -127,3 +127,12 @@ void command_builder::set_viewports(viewport *viewports, size_t viewport_count) 
   vkCmdSetViewport(buffer_, 0, viewport_count, reinterpret_cast<VkViewport*>(viewports));
 }
 
+void command_builder::update_buffer(buffer dst, size_t offset, const void *src, size_t size) {
+#if VK_HEADER_VERSION < 19
+  vkCmdUpdateBuffer(buffer_, dst, offset, size, 
+                    static_cast<const uint32_t*>(src));
+#else
+  vkCmdUpdateBuffer(buffer_, dst, offset, size, src);
+#endif 
+}
+
