@@ -264,7 +264,31 @@ enum class signal_status {
   unsignaled
 };
 
+template<size_t N> class offset;
+
+template<>
+class offset<2> {
+public:
+  int32_t x;
+  int32_t y;
+};
+
+template<>
+class offset<3> {
+public:
+  int32_t x;
+  int32_t y;
+  int32_t z;
+};
+
 template<size_t N> class extent;
+
+template<>
+class extent<2> {
+public:
+  uint32_t width;
+  uint32_t height;
+};
 
 template<>
 class extent<3> {
