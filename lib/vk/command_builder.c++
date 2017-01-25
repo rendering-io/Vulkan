@@ -111,6 +111,16 @@ void command_builder::pipeline_barrier(const memory_barrier *barriers,
                        /*image_barrier_count*/1, &barrier/*image_barrier_buf.data()*/);
 }
 
+void command_builder::reset_event(event event, pipeline_stage stage_mask) {
+  vkCmdResetEvent(buffer_, event, 
+                  static_cast<VkPipelineStageFlags>(stage_mask));
+}
+
+void command_builder::set_event(event event, pipeline_stage stage_mask) {
+  vkCmdSetEvent(buffer_, event, 
+                static_cast<VkPipelineStageFlags>(stage_mask));
+}
+
 void command_builder::set_line_width(float width) {
   vkCmdSetLineWidth(buffer_, width);
 }

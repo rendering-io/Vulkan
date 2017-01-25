@@ -549,6 +549,8 @@ public:
                         uint32_t buffer_barrier_count,
                         const image_memory_barrier *image_barriers,
                         uint32_t image_barrier_count, image image);
+  void reset_event(event event, pipeline_stage stage_mask);
+  void set_event(event event, pipeline_stage stage_mask);
   void set_line_width(float width);
   void set_depth_bias(float constant_factor, float clamp, float slope_factor);
   void set_depth_bounds(float min, float max);
@@ -645,6 +647,8 @@ public:
   
   void set();
   void reset();
+
+  operator VkEvent();
 private:
   class impl;
   std::shared_ptr<impl> impl_;

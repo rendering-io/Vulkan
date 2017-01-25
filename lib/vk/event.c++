@@ -32,6 +32,10 @@ event::event(device device)
   assert(VK_SUCCESS == result && "Failed to create event.");
 }
 
+event::operator VkEvent() {
+  return impl_->handle_;
+}
+
 void event::set() {
   auto result = vkSetEvent(impl_->device_, impl_->handle_);
   assert(VK_SUCCESS == result && "Failed to set event.");
