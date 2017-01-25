@@ -27,7 +27,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_report_callback(VkDebugReportFlagsEX
   if (VK_DEBUG_REPORT_DEBUG_BIT_EXT & flags)
     return VK_FALSE;
 
-  std::cout << msg << '\n';
+  std::cerr << msg << '\n';
 
   if (VK_DEBUG_REPORT_ERROR_BIT_EXT &flags)
     exit(-1);
@@ -89,7 +89,6 @@ instance::instance()
         // We should also check each returned extension, but for now we need
         // all of them.
         enabled_extensions.push_back(extension.extensionName);
-        std::cout << "Enabled " << extension.extensionName << "\n";
       }
     }
   }

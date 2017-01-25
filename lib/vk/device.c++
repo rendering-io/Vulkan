@@ -1,6 +1,5 @@
 #include <vk/vk.h>
 #include <cassert>
-#include <iostream>
 
 using namespace vk;
 
@@ -52,7 +51,6 @@ device::device(const vk::physical_device& physical_dev)
     if (VK_SUCCESS == result) {
       for (auto &extension: extensions) {
         enabled_extensions.push_back(extension.extensionName);
-        std::cout << "Enabled device extension " << extension.extensionName << "\n";
       }
     }
   }

@@ -264,6 +264,16 @@ enum class signal_status {
   unsignaled
 };
 
+template<size_t N> class extent;
+
+template<>
+class extent<3> {
+public:
+  uint32_t width;
+  uint32_t height;
+  uint32_t depth;
+};
+
 // Explicitly binary compatible with VkPipelineStageFlagBits
 enum class pipeline_stage {
   top_of_pipe             = 0x00000001,
@@ -615,6 +625,7 @@ protected:
   image(device device, VkImage handle, bool owns_handle);
 
 public:
+  image(device device, texel_format format, extent<3> extent, uint32_t mip_levels, uint32_t array_layers);
   void bind(device_memory memory, size_t offset, size_t size);
   size_t minimum_allocation_size() const;
   size_t minimum_allocation_alignment() const;

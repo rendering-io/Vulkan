@@ -29,6 +29,31 @@ image::image(device device, VkImage handle, bool owns_handle)
   vkGetImageMemoryRequirements(impl_->device_, impl_->handle_, &impl_->memory_requirements_);
 }
 
+image::image(device device, texel_format format, extent<3> extent, uint32_t mip_levels, uint32_t array_layers)
+: impl_{std::make_shared<impl>(device, static_cast<VkImage>(VK_NULL_HANDLE),
+                               true)} {
+  VkImageCreateInfo info;
+  info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.imageType = VK_IMAGE_TYPE_2D;
+  info.format = static_cast<VkFormat>(format);
+  info.extent.width = extent.width;
+  info.extent.height = extent.height;
+  info.extent.depth = extent.depth;
+  info.mipLevels = mip_levels;
+  info.arrayLayers = array_layers;
+  info.samples = VK_SAMPLE_COUNT_1_BIT;
+  info.tiling = VK_IMAGE_TILING_OPTIMAL;
+  info.usage = VK_IMAGE_USAGE_SAMPLED_BIT;
+  info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  info.queueFamilyIndexCount = 0;
+  info.pQueueFamilyIndices = nullptr;
+  info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  auto result = vkCreateImage(impl_->device_, &info, nullptr, &impl_->handle_);
+  assert(VK_SUCCESS == result && "Failed to create image.");
+}
+
 image::operator VkImage() {
   return impl_->handle_;
 }
