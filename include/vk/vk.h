@@ -731,9 +731,62 @@ private:
   std::shared_ptr<impl> impl_;
 };
 
+class attachment_description {
+public:
+  enum class load_operation: uint32_t {
+    load, 
+    clear,
+    dont_care
+  };
+
+  enum class store_operation: uint32_t {
+    store,
+    dont_care
+  };
+
+  attachment_description(texel_format format, 
+                         load_operation load_op, 
+                         store_operation store_op,
+                         load_operation stencil_load_op, 
+                         store_operation stencil_store_op,
+                         image_layout initial_layout,
+                         image_layout final_layout);
+private:
+  VkAttachmentDescription desc_;
+};
+
+class attachment_reference {
+public:
+  attachment_reference(uint32_t attachment_index, image_layout layout);
+private:
+  VkAttachmentReference ref_;
+};
+
+class subpass_description {
+public:
+  subpass_description(const attachment_reference *input_attachments,
+                      uint32_t input_attachment_count,
+                      const attachment_reference *colour_attachments,
+                      uint32_t colour_attachment_count,
+                      const attachment_reference *resolve_attachments,
+                      const attachment_reference *depth_stencil_attachment,
+                      const uint32_t *preserve_attachments,
+                      uint32_t preserve_attachment_count);
+private:
+  VkSubpassDescription desc_;
+};
+
+class subpass_dependency {
+private:
+  VkSubpassDependency depend_;
+};
+
 class render_pass {
 public:
-  render_pass(device device);
+  render_pass(device device, 
+              const attachment_description *attachments, uint32_t attachment_count,
+              const subpass_description *subpasses, uint32_t subpass_count,
+              const subpass_dependency *dependencies, uint32_t dependency_count);
 
   operator VkRenderPass();
 private:
@@ -759,9 +812,99 @@ public:
                    shader_module module, const char* entry_point);
 };
 
+class pipeline_shader {
+public:
+  enum class shader_stage {
+    vertex = VK_SHADER_STAGE_VERTEX_BIT,
+    tessellation_control,
+    tessellation_evaluation,
+    geometry,
+    fragment = VK_SHADER_STAGE_FRAGMENT_BIT
+  };
+  pipeline_shader(shader_stage stage, shader_module module,
+                  const char *entry_point);
+
+  shader_stage stage() const;
+  shader_module module() const;
+  const char *name() const;
+private:
+  shader_stage stage_;
+  shader_module module_;
+  const char *name_;
+};
+
+class vertex_input_binding {
+  enum class rate: uint32_t {
+    vertex = VK_VERTEX_INPUT_RATE_VERTEX,
+    instance = VK_VERTEX_INPUT_RATE_INSTANCE
+  };
+
+  uint32_t binding;
+  uint32_t stride;
+
+};
+
+class vertex_input_state {
+};
+
+class input_assembly_state {
+public:
+  enum class primitive_topology: uint32_t {
+    point_list = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+    line_list = VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+    line_strip = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+    triangle_list = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+    triangle_strip = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+    triangle_fan = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
+    line_list_with_adjacency = VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY,
+    line_strip_with_adjacency = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY,
+    triangle_list_with_adjacency = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY,
+    triangle_strip_with_adjacency = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY,
+    patch_list = VK_PRIMITIVE_TOPOLOGY_PATCH_LIST
+  };
+
+  //input_assembly_state(topology, bool restart_enabled);
+
+  primitive_topology topology;
+  bool primitive_restart_enabled;
+};
+
+class tessellation_state {
+};
+
+class viewport_state {
+};
+
+class rasterization_state {
+public:
+  rasterization_state();
+
+  bool depth_clamp_enabled;
+  bool rasterizer_discard_enabled;
+  bool depth_bias_enabled;
+  uint32_t cull_mode;
+};
+
+class multisample_state {
+};
+
+class depth_stencil_state {
+};
+
+class colour_blend_state {
+};
+
+class dynamic_state {
+};
+
 class graphics_pipeline: public pipeline {
 public:
-  graphics_pipeline(device device, pipeline_layout layout, 
+  graphics_pipeline(device device, const pipeline_shader *stages,
+                    uint32_t stage_count,
+                    const vertex_input_state &vertex_state,
+                    const input_assembly_state &assembly_state,
+                    const rasterization_state &raster_state,
+                    pipeline_layout layout, 
                     render_pass render_pass);
 };
 

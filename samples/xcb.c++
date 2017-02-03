@@ -2,6 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include "io.h"
 
 bool handle_events(xcb_connection_t* connection, xcb_atom_t wm_delete_window) {
   bool run = true;
@@ -28,6 +29,44 @@ auto choose_swapchain_format(const vk::physical_device &device, vk::surface surf
   auto formats = device.surface_formats(surface);
   assert(formats.size() > 0);
   return formats[0];
+}
+
+auto make_graphics_pipeline(vk::device device, vk::shader_module module) {
+  // Define a single subpass.
+  vk::subpass_description subpass{nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr, 0};
+
+  // Create a render pass.
+  vk::render_pass render_pass{device, nullptr, 0, &subpass, 1, nullptr, 0};
+
+  // Describe the pipeline layout.
+  vk::pipeline_layout layout{device, nullptr, 0};
+
+  // Describe the shader stages.
+  std::array<vk::pipeline_shader, 2> stages{
+    vk::pipeline_shader{vk::pipeline_shader::shader_stage::vertex, module, 
+                        "vertex_shader"},
+    vk::pipeline_shader{vk::pipeline_shader::shader_stage::fragment, module, 
+                        "fragment_shader"}
+  };
+
+  // Describe the vertex bindings.
+  vk::vertex_input_state vertex_input_state;
+
+  // Configure the input assembler.
+  vk::input_assembly_state assembly_state;
+  assembly_state.primitive_restart_enabled = true;
+  assembly_state.topology = vk::input_assembly_state::primitive_topology::point_list;
+
+  // Configure the rasterizer.
+  vk::rasterization_state raster_state;
+  raster_state.depth_clamp_enabled = false;
+  raster_state.rasterizer_discard_enabled = false;
+
+  // Create the actual pipeline.
+  return vk::graphics_pipeline{device, stages.data(), uint32_t(stages.size()),
+                               vertex_input_state, assembly_state,
+                               raster_state,
+                               layout, render_pass};
 }
 
 int main(int argc, char **argv) {
@@ -99,6 +138,13 @@ int main(int argc, char **argv) {
 
   // Create a swap chain.
   vk::swapchain swapchain{device, surface, format};
+
+  // Load the shader module.
+  auto spirv = load_shader("vector_add.spv");
+  vk::shader_module shader_module{device, spirv.data(), spirv.size() * sizeof(uint32_t)};
+
+  // Build a graphics pipeline.
+  auto pipeline = make_graphics_pipeline(device, shader_module);
 
   // Create the command buffer pool.
   vk::command_pool command_pool{device, family->index};
