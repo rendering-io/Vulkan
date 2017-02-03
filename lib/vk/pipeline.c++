@@ -104,6 +104,17 @@ static void initialize_raster_state_create_info(VkPipelineRasterizationStateCrea
   info.lineWidth = 1.0f;
 }
 
+static void initialize_viewport_state_create_info(VkPipelineViewportStateCreateInfo &info
+    ) {
+  info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.viewportCount = 0;
+  info.pViewports = nullptr;
+  info.scissorCount = 0;
+  info.pScissors = nullptr;
+}
+
 static void initialize_dynamic_state_create_info(VkPipelineDynamicStateCreateInfo &info
     ) {
   info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -159,6 +170,11 @@ graphics_pipeline::graphics_pipeline(device device,
   VkPipelineRasterizationStateCreateInfo raster_info;
   initialize_raster_state_create_info(raster_info, raster_state);
 
+  // Set up viewport state.
+  VkPipelineViewportStateCreateInfo viewport_info;
+  initialize_viewport_state_create_info(viewport_info);
+
+  // Set up dynamic state.
   VkPipelineDynamicStateCreateInfo dynamic_info;
   initialize_dynamic_state_create_info(dynamic_info);
 
@@ -172,7 +188,7 @@ graphics_pipeline::graphics_pipeline(device device,
   info.pVertexInputState = &vertex_info;
   info.pInputAssemblyState = &assembly_info;
   info.pTessellationState = nullptr;
-  info.pViewportState = nullptr;
+  info.pViewportState = &viewport_info;
   info.pRasterizationState = &raster_info;
   info.pMultisampleState = nullptr;
   info.pDepthStencilState = nullptr;
