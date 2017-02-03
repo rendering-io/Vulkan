@@ -31,7 +31,17 @@ auto choose_swapchain_format(const vk::physical_device &device, vk::surface surf
   return formats[0];
 }
 
-auto make_graphics_pipeline(vk::device device, vk::shader_module module) {
+auto make_graphics_pipeline(vk::device device) {
+  // Load the vertex shader module.
+  auto vertex_spirv = load_shader("triangle.vert.spv");
+  vk::shader_module vertex_shader{device, vertex_spirv.data(), 
+                                  vertex_spirv.size() * sizeof(uint32_t)};
+
+  // Load the fragment shader module.
+  auto fragment_spirv = load_shader("triangle.frag.spv");
+  vk::shader_module fragment_shader{device, fragment_spirv.data(), 
+                                    fragment_spirv.size() * sizeof(uint32_t)};
+
   // Define a single subpass.
   vk::subpass_description subpass{nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr, 0};
 
@@ -43,10 +53,10 @@ auto make_graphics_pipeline(vk::device device, vk::shader_module module) {
 
   // Describe the shader stages.
   std::array<vk::pipeline_shader, 2> stages{
-    vk::pipeline_shader{vk::pipeline_shader::shader_stage::vertex, module, 
-                        "vertex_shader"},
-    vk::pipeline_shader{vk::pipeline_shader::shader_stage::fragment, module, 
-                        "fragment_shader"}
+    vk::pipeline_shader{vk::pipeline_shader::shader_stage::vertex, 
+                        vertex_shader, "main"}, 
+    vk::pipeline_shader{vk::pipeline_shader::shader_stage::fragment,
+                        fragment_shader, "main"}
   };
 
   // Describe the vertex bindings.
@@ -139,12 +149,8 @@ int main(int argc, char **argv) {
   // Create a swap chain.
   vk::swapchain swapchain{device, surface, format};
 
-  // Load the shader module.
-  auto spirv = load_shader("vector_add.spv");
-  vk::shader_module shader_module{device, spirv.data(), spirv.size() * sizeof(uint32_t)};
-
   // Build a graphics pipeline.
-  auto pipeline = make_graphics_pipeline(device, shader_module);
+  auto pipeline = make_graphics_pipeline(device);
 
   // Create the command buffer pool.
   vk::command_pool command_pool{device, family->index};
