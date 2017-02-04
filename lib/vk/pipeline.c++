@@ -104,15 +104,21 @@ static void initialize_raster_state_create_info(VkPipelineRasterizationStateCrea
   info.lineWidth = 1.0f;
 }
 
-static void initialize_viewport_state_create_info(VkPipelineViewportStateCreateInfo &info
-    ) {
+viewport_state::viewport_state(const viewport *viewports, 
+                               const rect<2> *scissors, uint32_t count)
+: viewports_{viewports}, scissors_{scissors}, count_{count}
+{
+}
+
+static void initialize_viewport_state_create_info(VkPipelineViewportStateCreateInfo &info,
+    const viewport_state &viewport_state) {
   info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
   info.pNext = nullptr;
   info.flags = 0;
-  info.viewportCount = 0;
-  info.pViewports = nullptr;
-  info.scissorCount = 0;
-  info.pScissors = nullptr;
+  info.viewportCount = viewport_state.count_;
+  info.pViewports = reinterpret_cast<const VkViewport*>(viewport_state.viewports_);
+  info.scissorCount = viewport_state.count_;
+  info.pScissors = reinterpret_cast<const VkRect2D*>(viewport_state.scissors_);
 }
 
 static void initialize_dynamic_state_create_info(VkPipelineDynamicStateCreateInfo &info
@@ -129,6 +135,7 @@ graphics_pipeline::graphics_pipeline(device device,
                                      uint32_t stage_count,
                                      const vertex_input_state &vertex_state,
                                      const input_assembly_state &assembly_state,
+                                     const viewport_state &viewport_state,
                                      const rasterization_state &raster_state,
                                      pipeline_layout layout,
                                      render_pass render_pass)
@@ -172,7 +179,7 @@ graphics_pipeline::graphics_pipeline(device device,
 
   // Set up viewport state.
   VkPipelineViewportStateCreateInfo viewport_info;
-  initialize_viewport_state_create_info(viewport_info);
+  initialize_viewport_state_create_info(viewport_info, viewport_state);
 
   // Set up dynamic state.
   VkPipelineDynamicStateCreateInfo dynamic_info;

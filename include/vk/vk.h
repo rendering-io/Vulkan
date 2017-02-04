@@ -298,6 +298,13 @@ public:
   uint32_t depth;
 };
 
+template<size_t N>
+class rect {
+public:
+  vk::offset<N> offset;
+  vk::extent<N> extent;
+};
+
 // Explicitly binary compatible with VkPipelineStageFlagBits
 enum class pipeline_stage {
   top_of_pipe             = 0x00000001,
@@ -873,6 +880,13 @@ class tessellation_state {
 };
 
 class viewport_state {
+public:
+  viewport_state(const viewport *viewports, const rect<2> *scissors,
+                 uint32_t count);
+
+  const viewport *viewports_;
+  const rect<2> *scissors_;
+  uint32_t count_;
 };
 
 class rasterization_state {
@@ -903,6 +917,7 @@ public:
                     uint32_t stage_count,
                     const vertex_input_state &vertex_state,
                     const input_assembly_state &assembly_state,
+                    const viewport_state &viewport_state,
                     const rasterization_state &raster_state,
                     pipeline_layout layout, 
                     render_pass render_pass);

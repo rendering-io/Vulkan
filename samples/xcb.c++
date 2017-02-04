@@ -43,10 +43,22 @@ auto make_graphics_pipeline(vk::device device) {
                                     fragment_spirv.size() * sizeof(uint32_t)};
 
   // Define a single subpass.
-  vk::subpass_description subpass{nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr, 0};
+  vk::attachment_reference colour_references{0, vk::image_layout::color_attachment};
+  vk::subpass_description subpass{nullptr, 0, &colour_references, 1, nullptr, nullptr, nullptr, 0};
+
+  // Describe the attachments for the render pass.
+  vk::attachment_description attachment{
+    vk::texel_format::r8g8b8a8_unorm,
+    vk::attachment_description::load_operation::dont_care,
+    vk::attachment_description::store_operation::store,
+    vk::attachment_description::load_operation::dont_care,
+    vk::attachment_description::store_operation::store,
+    vk::image_layout::undefined,
+    vk::image_layout::present_source
+  };
 
   // Create a render pass.
-  vk::render_pass render_pass{device, nullptr, 0, &subpass, 1, nullptr, 0};
+  vk::render_pass render_pass{device, &attachment, 1, &subpass, 1, nullptr, 0};
 
   // Describe the pipeline layout.
   vk::pipeline_layout layout{device, nullptr, 0};
@@ -67,15 +79,31 @@ auto make_graphics_pipeline(vk::device device) {
   assembly_state.primitive_restart_enabled = true;
   assembly_state.topology = vk::input_assembly_state::primitive_topology::point_list;
 
+  // Configure the viewports.
+  vk::viewport viewport;
+  viewport.x = 0.0f;
+  viewport.y = 0.0f;
+  viewport.width = 256.0f;
+  viewport.height = 256.0f;
+  viewport.min_depth = 0.0f;
+  viewport.max_depth = 1.0f;
+
+  vk::rect<2> scissor;
+  scissor.offset.x = 0;
+  scissor.offset.y = 0;
+  scissor.extent.width = 256;
+  scissor.extent.height = 256;
+  vk::viewport_state viewport_state{&viewport, &scissor, 1};
+  
   // Configure the rasterizer.
   vk::rasterization_state raster_state;
   raster_state.depth_clamp_enabled = false;
-  raster_state.rasterizer_discard_enabled = false;
+  raster_state.rasterizer_discard_enabled = true;
 
   // Create the actual pipeline.
   return vk::graphics_pipeline{device, stages.data(), uint32_t(stages.size()),
                                vertex_input_state, assembly_state,
-                               raster_state,
+                               viewport_state, raster_state, 
                                layout, render_pass};
 }
 
@@ -128,11 +156,10 @@ int main(int argc, char **argv) {
   // what queues we need to construct.
   const vk::queue_family *family = nullptr;
   for (auto &queue_family: best_physical_device->queue_families()) {
-    std::cout << "Queue fam\n";
-    if (queue_family.is_surface_supported(surface)/*1 || queue_family.is_presentation_supported(connection, window)*/) {
+//    if (queue_family.is_surface_supported(surface)/*1 || queue_family.is_presentation_supported(connection, window)*/) {
       family = &queue_family;
-      break;
-    }
+ //     break;
+ //   }
   }
  
   if (nullptr == family) {
@@ -146,11 +173,14 @@ int main(int argc, char **argv) {
   // Now choose our display surface format.
   auto format = choose_swapchain_format(*best_physical_device, surface);
 
-  // Create a swap chain.
+  // Build a graphics pipeline.
+  auto pipeline = make_graphics_pipeline(device);
+
+   // Create a swap chain.
   vk::swapchain swapchain{device, surface, format};
 
   // Build a graphics pipeline.
-  auto pipeline = make_graphics_pipeline(device);
+//  auto pipeline = make_graphics_pipeline(device);
 
   // Create the command buffer pool.
   vk::command_pool command_pool{device, family->index};
