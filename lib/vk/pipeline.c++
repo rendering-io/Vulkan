@@ -134,6 +134,35 @@ static void initialize_multisample_state_create_info(VkPipelineMultisampleStateC
   info.alphaToOneEnable = VK_FALSE;
 }
 
+static void initialize_colour_blend_state_create_info(
+  VkPipelineColorBlendStateCreateInfo &info,
+  VkPipelineColorBlendAttachmentState &attachment_info) {
+
+  attachment_info.blendEnable = VK_FALSE;
+  attachment_info.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+  attachment_info.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+  attachment_info.colorBlendOp = VK_BLEND_OP_ADD;
+  attachment_info.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+  attachment_info.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+  attachment_info.alphaBlendOp = VK_BLEND_OP_ADD;
+  attachment_info.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
+                                   VK_COLOR_COMPONENT_G_BIT |
+                                   VK_COLOR_COMPONENT_B_BIT |
+                                   VK_COLOR_COMPONENT_A_BIT;
+
+  info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.logicOpEnable = VK_FALSE;
+  info.logicOp = VK_LOGIC_OP_COPY;
+  info.attachmentCount = 1;
+  info.pAttachments = &attachment_info;
+  info.blendConstants[0] = 0.0f;  
+  info.blendConstants[1] = 0.0f;  
+  info.blendConstants[2] = 0.0f;  
+  info.blendConstants[3] = 0.0f;  
+}
+
 static void initialize_dynamic_state_create_info(VkPipelineDynamicStateCreateInfo &info
     ) {
   info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -199,6 +228,12 @@ graphics_pipeline::graphics_pipeline(device device,
   initialize_multisample_state_create_info(multisample_info);
 
   // Set up dynamic state.
+  VkPipelineColorBlendStateCreateInfo colour_blend_info;
+  VkPipelineColorBlendAttachmentState colour_blend_attachment_info;
+  initialize_colour_blend_state_create_info(colour_blend_info, 
+                                            colour_blend_attachment_info);
+
+  // Set up dynamic state.
   VkPipelineDynamicStateCreateInfo dynamic_info;
   initialize_dynamic_state_create_info(dynamic_info);
 
@@ -216,7 +251,7 @@ graphics_pipeline::graphics_pipeline(device device,
   info.pRasterizationState = &raster_info;
   info.pMultisampleState = &multisample_info;
   info.pDepthStencilState = nullptr;
-  info.pColorBlendState = nullptr;
+  info.pColorBlendState = &colour_blend_info;
   info.pDynamicState = dynamic_info.dynamicStateCount ? &dynamic_info : nullptr;
   info.layout = layout;
   info.renderPass = render_pass;
