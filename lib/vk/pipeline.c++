@@ -121,6 +121,19 @@ static void initialize_viewport_state_create_info(VkPipelineViewportStateCreateI
   info.pScissors = reinterpret_cast<const VkRect2D*>(viewport_state.scissors_);
 }
 
+static void initialize_multisample_state_create_info(VkPipelineMultisampleStateCreateInfo &info
+    ) {
+  info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  info.pNext = nullptr;
+  info.flags = 0;
+  info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+  info.sampleShadingEnable = VK_FALSE;
+  info.minSampleShading = 0.0f;
+  info.pSampleMask = nullptr;
+  info.alphaToCoverageEnable = VK_FALSE;
+  info.alphaToOneEnable = VK_FALSE;
+}
+
 static void initialize_dynamic_state_create_info(VkPipelineDynamicStateCreateInfo &info
     ) {
   info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -173,13 +186,17 @@ graphics_pipeline::graphics_pipeline(device device,
   assembly_info.topology = static_cast<VkPrimitiveTopology>(assembly_state.topology);
   assembly_info.primitiveRestartEnable = assembly_state.primitive_restart_enabled;
 
+  // Set up viewport state.
+  VkPipelineViewportStateCreateInfo viewport_info;
+  initialize_viewport_state_create_info(viewport_info, viewport_state);
+  
   // Set up raster state.
   VkPipelineRasterizationStateCreateInfo raster_info;
   initialize_raster_state_create_info(raster_info, raster_state);
 
-  // Set up viewport state.
-  VkPipelineViewportStateCreateInfo viewport_info;
-  initialize_viewport_state_create_info(viewport_info, viewport_state);
+  // Set up multisample state.
+  VkPipelineMultisampleStateCreateInfo multisample_info;
+  initialize_multisample_state_create_info(multisample_info);
 
   // Set up dynamic state.
   VkPipelineDynamicStateCreateInfo dynamic_info;
@@ -197,7 +214,7 @@ graphics_pipeline::graphics_pipeline(device device,
   info.pTessellationState = nullptr;
   info.pViewportState = &viewport_info;
   info.pRasterizationState = &raster_info;
-  info.pMultisampleState = nullptr;
+  info.pMultisampleState = &multisample_info;
   info.pDepthStencilState = nullptr;
   info.pColorBlendState = nullptr;
   info.pDynamicState = dynamic_info.dynamicStateCount ? &dynamic_info : nullptr;
