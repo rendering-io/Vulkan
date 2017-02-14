@@ -9,6 +9,7 @@ public:
   ~impl();
 
   vk::device device_;
+  std::unique_ptr<device_memory> memory_;
   VkImage handle_;
   VkMemoryRequirements memory_requirements_;
   bool owns_handle_;
@@ -61,6 +62,15 @@ image::operator VkImage() {
 void image::bind(device_memory memory, size_t offset, size_t /*size*/) {
   auto result = vkBindImageMemory(impl_->device_, impl_->handle_, memory, offset);
   assert(VK_SUCCESS == result && "Failed to bind image memory.");
+  impl_->memory_ = std::make_unique<vk::device_memory>(memory);
+}
+
+device & image::device() {
+  return impl_->device_;
+}
+
+const device & image::device() const {
+  return impl_->device_;
 }
 
 size_t image::minimum_allocation_alignment() const {

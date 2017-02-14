@@ -46,7 +46,7 @@ class image_memory_barrier;
 enum class image_layout {
   undefined                = VK_IMAGE_LAYOUT_UNDEFINED,
   general                  = VK_IMAGE_LAYOUT_GENERAL,
-  color_attachment         = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+  colour_attachment        = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
   depth_stencil_attachment = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
   depth_stencil_readonly   = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
   shader_readonly          = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -306,7 +306,7 @@ public:
 };
 
 // Explicitly binary compatible with VkPipelineStageFlagBits
-enum class pipeline_stage {
+enum class pipeline_stage: uint32_t {
   top_of_pipe             = 0x00000001,
   draw_indirect           = 0x00000002,
   vertex_input            = 0x00000004,
@@ -317,7 +317,7 @@ enum class pipeline_stage {
   fragment_shader         = 0x00000080,
   early_fragment_tests    = 0x00000100,
   late_fragment_tests     = 0x00000200,
-  color_attachment_output = 0x00000400,
+  colour_attachment_output = 0x00000400,
   compute_shader          = 0x00000800,
   transfer                = 0x00001000,
   bottom_of_pipe          = 0x00002000,
@@ -330,6 +330,18 @@ enum class pipeline_stage {
 inline pipeline_stage operator|(pipeline_stage lhs, pipeline_stage rhs) {
   using T = std::underlying_type_t<pipeline_stage>;
   return static_cast<pipeline_stage>(static_cast<T>(lhs) | static_cast<T>(rhs));
+}
+
+enum class image_aspect: uint32_t {
+  colour   = VK_IMAGE_ASPECT_COLOR_BIT,
+  depth    = VK_IMAGE_ASPECT_DEPTH_BIT,
+  stencil  = VK_IMAGE_ASPECT_STENCIL_BIT,
+  metadata = VK_IMAGE_ASPECT_METADATA_BIT,
+};
+
+inline image_aspect operator|(image_aspect lhs, image_aspect rhs) {
+  using T = std::underlying_type_t<image_aspect>;
+  return static_cast<image_aspect>(static_cast<T>(lhs) | static_cast<T>(rhs));
 }
 
 struct viewport {
@@ -356,6 +368,8 @@ enum class swizzle: uint32_t {
 };
 
 struct component_mapping {
+  component_mapping();
+
   swizzle r;
   swizzle g;
   swizzle b;
@@ -669,7 +683,7 @@ class subresource {
 
 class subresource_range {
 public:
-  uint32_t aspect_mask;
+  image_aspect aspect_mask;
   uint32_t base_mip_level;
   uint32_t mip_count;
   uint32_t base_array_layer;
@@ -1091,7 +1105,8 @@ public:
   operator VkSwapchainKHR();
 
   swapchain_image acquire_next_image();
-  swapchain_image get_image(uint32_t index);
+  swapchain_image & get_image(uint32_t index);
+  const swapchain_image & get_image(uint32_t index) const;
   uint32_t size() const;
 private:
   class impl;

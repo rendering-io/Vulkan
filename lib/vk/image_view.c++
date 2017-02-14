@@ -21,6 +21,11 @@ image_view::impl::~impl() {
   }
 }
 
+component_mapping::component_mapping() 
+: r{swizzle::identity}, g{swizzle::identity}, b{swizzle::identity}, 
+  a{swizzle::identity}
+{}
+
 image_view::image_view(image image, type view_type, texel_format format, 
                        component_mapping swizzle, subresource_range range)
 : impl_{std::make_shared<impl>(std::move(image))} {
@@ -35,7 +40,7 @@ image_view::image_view(image image, type view_type, texel_format format,
   info.components.g = static_cast<VkComponentSwizzle>(swizzle.g);
   info.components.b = static_cast<VkComponentSwizzle>(swizzle.b);
   info.components.a = static_cast<VkComponentSwizzle>(swizzle.a);
-  info.subresourceRange.aspectMask = range.aspect_mask;
+  info.subresourceRange.aspectMask = static_cast<VkImageAspectFlags>(range.aspect_mask);
   info.subresourceRange.baseMipLevel = range.base_mip_level;
   info.subresourceRange.levelCount = range.mip_count;
   info.subresourceRange.baseArrayLayer = range.base_array_layer;
@@ -44,4 +49,8 @@ image_view::image_view(image image, type view_type, texel_format format,
   auto result = vkCreateImageView(impl_->image_.device(), &info, nullptr, 
                                   &impl_->handle_);
   assert(VK_SUCCESS == result && "Failed to create image view.");
+}
+
+image_view::operator VkImageView() {
+  return impl_->handle_;
 }

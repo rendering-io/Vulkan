@@ -29,17 +29,22 @@ bool handle_events(xcb_connection_t* connection, xcb_atom_t wm_delete_window) {
 auto choose_swapchain_format(const vk::physical_device &device, vk::surface surface) {
   auto formats = device.surface_formats(surface);
   assert(formats.size() > 0);
+  for (auto &format: formats) {
+    if (vk::texel_format::b8g8r8a8_unorm == format.format)
+      return format;
+  }
+
   return formats[0];
 }
 
 auto make_render_pass(vk::device device) {
   // Define a single subpass.
-  vk::attachment_reference colour_references{0, vk::image_layout::color_attachment};
+  vk::attachment_reference colour_references{0, vk::image_layout::colour_attachment};
   vk::subpass_description subpass{nullptr, 0, &colour_references, 1, nullptr, nullptr, nullptr, 0};
 
   // Describe the attachments for the render pass.
   vk::attachment_description attachment{
-    vk::texel_format::r8g8b8a8_unorm,
+    vk::texel_format::b8g8r8a8_unorm,
     vk::attachment_description::load_operation::dont_care,
     vk::attachment_description::store_operation::store,
     vk::attachment_description::load_operation::dont_care,
@@ -50,6 +55,17 @@ auto make_render_pass(vk::device device) {
 
   // Create a render pass.
   return vk::render_pass{device, &attachment, 1, &subpass, 1, nullptr, 0};
+}
+
+auto choose_image_memory_type(const vk::physical_device &physical_device) {
+  // Now we want to find a host-coherent memory region.
+  const vk::physical_device::memory_type* best_memory_type = nullptr;
+  for (auto &memory_type: physical_device.memory_types()) {
+    if (memory_type.is_device_local())
+      best_memory_type = &memory_type;
+  }
+
+  return best_memory_type;
 }
 
 auto make_graphics_pipeline(vk::device device, vk::render_pass render_pass) {
@@ -161,6 +177,9 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  // Find the best memory type for images.
+  auto image_memory_type = choose_image_memory_type(*best_physical_device);
+
   // Create a surface.
   vk::surface surface{instance, connection, window};
  
@@ -195,18 +214,44 @@ int main(int argc, char **argv) {
   // Create a swap chain.
   vk::swapchain swapchain{device, surface, format};
 
+  // Define the component swizzles to apply to image views.
+  vk::component_mapping components;
+
+  // Define the subresource range from the render target.
+  vk::subresource_range subresource_range;
+  subresource_range.aspect_mask = vk::image_aspect::colour;
+  subresource_range.base_mip_level = 0;
+  subresource_range.mip_count = 1;
+  subresource_range.base_array_layer = 0;
+  subresource_range.layer_count = 1;
+
   std::vector<vk::framebuffer> frame_buffers;
   std::vector<vk::image_view> swapchain_views;
+  auto size_in_bytes = 0ul;
   for (auto i = 0u; i < swapchain.size(); ++i) {
-    auto image = swapchain.get_image(i);
+    auto &image = swapchain.get_image(i);
+    size_in_bytes += image.minimum_allocation_size();
+  }
+
+  vk::device_memory image_storage{device, *image_memory_type, size_in_bytes};
+  auto offset_in_bytes = 0ul;
+  for (auto i = 0u; i < swapchain.size(); ++i) {
+    // Get the next image.
+    auto &image = swapchain.get_image(i);
+
+    // Bind to device memory.
+    size_in_bytes = image.minimum_allocation_size();
+    //image.bind(image_storage, offset_in_bytes, size_in_bytes);
+    offset_in_bytes += size_in_bytes;
+
     auto image_view = vk::image_view{image, vk::image_view::type::image_2d,
-                                     image.format(), components, 
+                                     format.format, components, 
                                      subresource_range};
     swapchain_views.emplace_back(image_view);
 
-    auto framebuffer = vk::framebuffer{render_pass, &image_view, 1, 
-                                       width, height, 1};
-    //frame_buffers.emplace_back();
+    auto framebuffer = vk::framebuffer{device, render_pass, &image_view, 1, 
+                                       WIDTH, HEIGHT, 1};
+    frame_buffers.emplace_back(framebuffer);
   }
 
   // Create the command buffer pool.

@@ -143,3 +143,14 @@ swapchain_image swapchain::acquire_next_image() {
   return impl_->images_[index];
 }
 
+swapchain_image & swapchain::get_image(uint32_t index) {
+  return impl_->images_[index];
+}
+
+const swapchain_image & swapchain::get_image(uint32_t index) const {
+  return impl_->images_[index];
+}
+
+uint32_t swapchain::size() const {
+  return impl_->images_.size();
+}
