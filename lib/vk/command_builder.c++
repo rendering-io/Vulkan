@@ -93,7 +93,7 @@ void command_builder::pipeline_barrier(const memory_barrier *barriers,
   barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER; 
   barrier.pNext = nullptr;
   barrier.srcAccessMask = 0;
-  barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+  barrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
   barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
   barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;

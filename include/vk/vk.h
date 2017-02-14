@@ -345,6 +345,23 @@ struct surface_format {
   texel_format format;
 };
 
+enum class swizzle: uint32_t {
+  identity = VK_COMPONENT_SWIZZLE_IDENTITY,
+  zero = VK_COMPONENT_SWIZZLE_ZERO,
+  one = VK_COMPONENT_SWIZZLE_ONE,
+  r = VK_COMPONENT_SWIZZLE_R,
+  g = VK_COMPONENT_SWIZZLE_G,
+  b = VK_COMPONENT_SWIZZLE_B,
+  a = VK_COMPONENT_SWIZZLE_A,
+};
+
+struct component_mapping {
+  swizzle r;
+  swizzle g;
+  swizzle b;
+  swizzle a;
+};
+
 template<typename I>
 class iterator_range : std::pair<I, I> {
 public:
@@ -646,23 +663,32 @@ private:
 bool map_memory(device_memory, size_t, size_t, void **);
 void unmap_memory(device_memory memory);
 
-class image_subresource {
+class subresource {
   
 };
 
-class image_subresource_range {
-  
+class subresource_range {
+public:
+  uint32_t aspect_mask;
+  uint32_t base_mip_level;
+  uint32_t mip_count;
+  uint32_t base_array_layer;
+  uint32_t layer_count;
 };
 
 class image {
 protected:
-  image(device device, VkImage handle, bool owns_handle);
+  image(vk::device device, VkImage handle, bool owns_handle);
 
 public:
-  image(device device, texel_format format, extent<3> extent, uint32_t mip_levels, uint32_t array_layers);
+  image(vk::device device, texel_format format, extent<3> extent,
+        uint32_t mip_levels, uint32_t array_layers);
   void bind(device_memory memory, size_t offset, size_t size);
   size_t minimum_allocation_size() const;
   size_t minimum_allocation_alignment() const;
+
+  vk::device& device();
+  const vk::device& device() const;
 
   operator VkImage();
 private:
@@ -706,7 +732,17 @@ private:
 
 class image_view {
 public:
-  image_view(device device);
+  enum class type: uint32_t {
+    image_1d = VK_IMAGE_VIEW_TYPE_1D,
+    image_2d = VK_IMAGE_VIEW_TYPE_2D,
+    image_3d = VK_IMAGE_VIEW_TYPE_3D,
+    cube_map = VK_IMAGE_VIEW_TYPE_CUBE,
+    image_array_1d = VK_IMAGE_VIEW_TYPE_1D_ARRAY,
+    image_array_2d = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
+    cube_map_array = VK_IMAGE_VIEW_TYPE_CUBE_ARRAY,
+  };
+  image_view(image image, type view_type, texel_format format, 
+             component_mapping components, subresource_range range);
 
   operator VkImageView();
 private:
@@ -1055,6 +1091,8 @@ public:
   operator VkSwapchainKHR();
 
   swapchain_image acquire_next_image();
+  swapchain_image get_image(uint32_t index);
+  uint32_t size() const;
 private:
   class impl;
   std::shared_ptr<impl> impl_;
@@ -1062,7 +1100,8 @@ private:
 
 class swapchain_image : public image {
 private:
-  swapchain_image(device device, swapchain chain, VkImage handle, uint32_t index); 
+  swapchain_image(vk::device device, swapchain chain, VkImage handle,
+                  uint32_t index); 
   
   swapchain swapchain_;
   uint32_t index_;

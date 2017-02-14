@@ -23,7 +23,7 @@ swapchain::impl::~impl() {
     vkDestroySwapchainKHR(device_, handle_, nullptr);
 }
 
-swapchain_image::swapchain_image(device device, swapchain swapchain, VkImage handle, uint32_t index)
+swapchain_image::swapchain_image(vk::device device, swapchain swapchain, VkImage handle, uint32_t index)
 : image{device, handle, false}, swapchain_{swapchain}, index_{index} { }
 
 swapchain::swapchain(device device, surface surface, surface_format format)

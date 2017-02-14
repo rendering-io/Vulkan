@@ -2,6 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <xcb/xcb_icccm.h>
 #include "io.h"
 
 bool handle_events(xcb_connection_t* connection, xcb_atom_t wm_delete_window) {
@@ -31,17 +32,7 @@ auto choose_swapchain_format(const vk::physical_device &device, vk::surface surf
   return formats[0];
 }
 
-auto make_graphics_pipeline(vk::device device) {
-  // Load the vertex shader module.
-  auto vertex_spirv = load_shader("triangle.vert.spv");
-  vk::shader_module vertex_shader{device, vertex_spirv.data(), 
-                                  vertex_spirv.size() * sizeof(uint32_t)};
-
-  // Load the fragment shader module.
-  auto fragment_spirv = load_shader("triangle.frag.spv");
-  vk::shader_module fragment_shader{device, fragment_spirv.data(), 
-                                    fragment_spirv.size() * sizeof(uint32_t)};
-
+auto make_render_pass(vk::device device) {
   // Define a single subpass.
   vk::attachment_reference colour_references{0, vk::image_layout::color_attachment};
   vk::subpass_description subpass{nullptr, 0, &colour_references, 1, nullptr, nullptr, nullptr, 0};
@@ -58,7 +49,20 @@ auto make_graphics_pipeline(vk::device device) {
   };
 
   // Create a render pass.
-  vk::render_pass render_pass{device, &attachment, 1, &subpass, 1, nullptr, 0};
+  return vk::render_pass{device, &attachment, 1, &subpass, 1, nullptr, 0};
+}
+
+auto make_graphics_pipeline(vk::device device, vk::render_pass render_pass) {
+  // Load the vertex shader module.
+  auto vertex_spirv = load_shader("triangle.vert.spv");
+  vk::shader_module vertex_shader{device, vertex_spirv.data(), 
+                                  vertex_spirv.size() * sizeof(uint32_t)};
+
+  // Load the fragment shader module.
+  auto fragment_spirv = load_shader("triangle.frag.spv");
+  vk::shader_module fragment_shader{device, fragment_spirv.data(), 
+                                    fragment_spirv.size() * sizeof(uint32_t)};
+
 
   // Describe the pipeline layout.
   vk::pipeline_layout layout{device, nullptr, 0};
@@ -108,6 +112,9 @@ auto make_graphics_pipeline(vk::device device) {
 }
 
 int main(int argc, char **argv) {
+  const int WIDTH = 1024;
+  const int HEIGHT = 1024;
+
   // Open an xcb connection and get the first screen.
   auto connection = xcb_connect(nullptr, nullptr);
   auto screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
@@ -116,11 +123,16 @@ int main(int argc, char **argv) {
   auto window = xcb_generate_id(connection);
   xcb_create_window(connection, XCB_COPY_FROM_PARENT,
                     window, screen->root,
-                    0, 0, 150, 150, // Position and size.
+                    0, 0, WIDTH, HEIGHT, // Position and size.
                     10,            // Border width.
                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                     screen->root_visual,
                     0, NULL);      // Masks, not used yet.  
+
+  xcb_size_hints_t hints;
+  xcb_icccm_size_hints_set_min_size(&hints, WIDTH, HEIGHT);
+  xcb_icccm_size_hints_set_max_size(&hints, WIDTH, HEIGHT);
+  xcb_icccm_set_wm_size_hints(connection, window, XCB_ATOM_WM_NORMAL_HINTS, &hints);
 
   // Map the window on the screen.
   xcb_map_window(connection, window);
@@ -156,10 +168,11 @@ int main(int argc, char **argv) {
   // what queues we need to construct.
   const vk::queue_family *family = nullptr;
   for (auto &queue_family: best_physical_device->queue_families()) {
-//    if (queue_family.is_surface_supported(surface)/*1 || queue_family.is_presentation_supported(connection, window)*/) {
+    if (queue_family.is_graphics_queue() &&
+        queue_family.is_surface_supported(surface)) {
       family = &queue_family;
- //     break;
- //   }
+      break;
+    }
   }
  
   if (nullptr == family) {
@@ -173,14 +186,28 @@ int main(int argc, char **argv) {
   // Now choose our display surface format.
   auto format = choose_swapchain_format(*best_physical_device, surface);
 
-  // Build a graphics pipeline.
-  auto pipeline = make_graphics_pipeline(device);
+  // Build render pass.
+  auto render_pass = make_render_pass(device);
 
-   // Create a swap chain.
+  // Build a graphics pipeline.
+  auto pipeline = make_graphics_pipeline(device, render_pass);
+
+  // Create a swap chain.
   vk::swapchain swapchain{device, surface, format};
 
-  // Build a graphics pipeline.
-//  auto pipeline = make_graphics_pipeline(device);
+  std::vector<vk::framebuffer> frame_buffers;
+  std::vector<vk::image_view> swapchain_views;
+  for (auto i = 0u; i < swapchain.size(); ++i) {
+    auto image = swapchain.get_image(i);
+    auto image_view = vk::image_view{image, vk::image_view::type::image_2d,
+                                     image.format(), components, 
+                                     subresource_range};
+    swapchain_views.emplace_back(image_view);
+
+    auto framebuffer = vk::framebuffer{render_pass, &image_view, 1, 
+                                       width, height, 1};
+    //frame_buffers.emplace_back();
+  }
 
   // Create the command buffer pool.
   vk::command_pool command_pool{device, family->index};

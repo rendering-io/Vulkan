@@ -9,6 +9,10 @@ queue_family::queue_family(physical_device &physical_device, uint32_t index,
 { 
 }
 
+bool queue_family::is_graphics_queue() const {
+  return flags_ & VK_QUEUE_GRAPHICS_BIT;
+}
+
 bool queue_family::is_surface_supported(surface surface) const {
   VkBool32 supported = false;
   auto result = vkGetPhysicalDeviceSurfaceSupportKHR(physical_device_, index,

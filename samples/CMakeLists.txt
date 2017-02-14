@@ -9,4 +9,4 @@ configure_file(triangle.frag.spv ${CMAKE_BINARY_DIR}/triangle.frag.spv COPYONLY)
 
 # Build xcb sample.
 add_executable(xcb-demo xcb.c++)
-target_link_libraries(xcb-demo PRIVATE vk xcb)
+target_link_libraries(xcb-demo PRIVATE vk xcb xcb-icccm)
