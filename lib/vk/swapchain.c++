@@ -66,7 +66,7 @@ swapchain::swapchain(device device, surface surface, surface_format format)
   info.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
   info.imageExtent = caps.currentExtent;
   info.imageArrayLayers = 1;
-  info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT;
   info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
   info.queueFamilyIndexCount = 0;
   info.pQueueFamilyIndices = nullptr;

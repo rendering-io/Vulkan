@@ -254,6 +254,12 @@ int main(int argc, char **argv) {
     frame_buffers.emplace_back(framebuffer);
   }
 
+  vk::clear_colour_value clear_colour;
+  clear_colour.float32[0] = 1.0f;
+  clear_colour.float32[1] = 0.0f;
+  clear_colour.float32[2] = 0.0f;
+  clear_colour.float32[3] = 1.0f;
+
   // Create the command buffer pool.
   vk::command_pool command_pool{device, family->index};
   vk::command_buffer command_buffer = command_pool.allocate();
@@ -266,10 +272,17 @@ int main(int argc, char **argv) {
     // Grab an image and immediately present it.
     auto image = swapchain.acquire_next_image();
     command_buffer.record([&](vk::command_builder& builder) {
-      builder.pipeline_barrier(nullptr, 0, nullptr, 0, nullptr, 0, image);
+      builder.pipeline_barrier(nullptr, 0, nullptr, 0, nullptr, 0,
+                               image, vk::image_layout::transfer_destination);
+      builder.clear_colour_image(image, vk::image_layout::transfer_destination,
+                                 clear_colour,
+                                 &subresource_range, 1);
+      builder.pipeline_barrier(nullptr, 0, nullptr, 0, nullptr, 0,
+                               image, vk::image_layout::present_source);
     });
 
     queue.submit(&command_buffer, 1);
+    queue.wait_idle();
     queue.present(image);
     queue.wait_idle();
   }

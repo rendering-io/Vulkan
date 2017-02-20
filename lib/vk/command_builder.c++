@@ -24,6 +24,27 @@ void command_builder::bind_index_buffer(buffer buffer, size_t offset, index_type
   vkCmdBindIndexBuffer(buffer_, buffer, offset, vk_index_type);
 }
 
+void command_builder::clear_colour_image(image image, 
+                                         image_layout layout, 
+                                         const clear_colour_value &colour,
+                                         const subresource_range *ranges,
+                                         uint32_t range_count) {
+  VkClearColorValue value;
+
+  std::vector<VkImageSubresourceRange> subresource_ranges(range_count);
+  for (auto i = 0u; i < range_count; ++i) {
+    subresource_ranges[i].aspectMask = 
+                        static_cast<VkImageAspectFlags>(ranges[i].aspect_mask);
+    subresource_ranges[i].baseMipLevel = ranges[i].base_mip_level;
+    subresource_ranges[i].levelCount = ranges[i].mip_count;
+    subresource_ranges[i].baseArrayLayer = ranges[i].base_array_layer;
+    subresource_ranges[i].layerCount = ranges[i].layer_count;    
+  }
+  vkCmdClearColorImage(buffer_, image, static_cast<VkImageLayout>(layout),
+                       &value, 
+                       range_count, subresource_ranges.data());  
+}
+
 void command_builder::dispatch(uint32_t x, uint32_t y, uint32_t z) {
   vkCmdDispatch(buffer_, x, y, z);
 }
@@ -81,7 +102,8 @@ void command_builder::pipeline_barrier(const memory_barrier *barriers,
                                        const buffer_memory_barrier *buffer_barriers,
                                        uint32_t buffer_barrier_count,
                                        const image_memory_barrier *image_barriers, 
-                                       uint32_t image_barrier_count,image image ) {
+                                       uint32_t image_barrier_count,
+                                       image image, image_layout layout) {
   VkPipelineStageFlags src_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
   VkPipelineStageFlags dst_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
   VkDependencyFlags dependency_flags = 0;
@@ -89,13 +111,20 @@ void command_builder::pipeline_barrier(const memory_barrier *barriers,
   std::vector<VkBufferMemoryBarrier> buffer_barrier_buf;
   std::vector<VkImageMemoryBarrier> image_barrier_buf;
 
+  uint32_t dst_mask = 0;
+  if (image_layout::transfer_destination == layout){
+    dst_mask |= VK_ACCESS_TRANSFER_WRITE_BIT;
+  } else if (image_layout::present_source == layout){
+    dst_mask |= VK_ACCESS_MEMORY_READ_BIT;
+  }
+
   VkImageMemoryBarrier barrier;
   barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER; 
   barrier.pNext = nullptr;
   barrier.srcAccessMask = 0;
-  barrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+  barrier.dstAccessMask = dst_mask;
   barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+  barrier.newLayout = static_cast<VkImageLayout>(layout);
   barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
   barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
   barrier.image = image;

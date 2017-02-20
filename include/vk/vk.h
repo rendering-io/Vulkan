@@ -376,6 +376,25 @@ struct component_mapping {
   swizzle a;
 };
 
+class subresource {
+  
+};
+
+class subresource_range {
+public:
+  image_aspect aspect_mask;
+  uint32_t base_mip_level;
+  uint32_t mip_count;
+  uint32_t base_array_layer;
+  uint32_t layer_count;
+};
+
+union clear_colour_value {
+  float    float32[4];
+  int32_t  int32[4];
+  uint32_t uint32[4];
+};
+
 template<typename I>
 class iterator_range : std::pair<I, I> {
 public:
@@ -591,6 +610,10 @@ private:
 
 public:
   void bind_index_buffer(buffer buffer, size_t offset, index_type type);
+  void clear_colour_image(image image, image_layout layout, 
+                          const clear_colour_value &colour,
+                          const subresource_range *ranges,
+                          uint32_t range_count);
   void dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1);
   void dispatch_indirect(buffer buffer, size_t offset = 0);
   void draw(uint32_t vertex_count, uint32_t instance_count,
@@ -610,7 +633,8 @@ public:
                         const buffer_memory_barrier * buffer_barriers,
                         uint32_t buffer_barrier_count,
                         const image_memory_barrier *image_barriers,
-                        uint32_t image_barrier_count, image image);
+                        uint32_t image_barrier_count, 
+                        image image, image_layout layout);
   void reset_event(event event, pipeline_stage stage_mask);
   void set_event(event event, pipeline_stage stage_mask);
   void set_line_width(float width);
@@ -676,19 +700,6 @@ private:
 
 bool map_memory(device_memory, size_t, size_t, void **);
 void unmap_memory(device_memory memory);
-
-class subresource {
-  
-};
-
-class subresource_range {
-public:
-  image_aspect aspect_mask;
-  uint32_t base_mip_level;
-  uint32_t mip_count;
-  uint32_t base_array_layer;
-  uint32_t layer_count;
-};
 
 class image {
 protected:
